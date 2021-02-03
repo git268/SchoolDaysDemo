@@ -16,28 +16,27 @@
 'QmsgKey'：     Qmsg酱key
 两者皆用于消息推送，使用哪个填哪个，默认使用Qmsg酱
 
-若要更改推送方式，本脚本有2处推送运行结果，都需更改
-
-	第一处	[用于返回任务异常状态]
-	若为签到任务，在SignTask.php中第26行，
-	若为信息收集，在CollectMessage.php中第25行，
+4,若要更改推送方式，本脚本有2处推送运行结果，都需更改
+第一处	[用于返回任务异常状态]
+若为签到任务，在SignTask.php中第26行，
+若为信息收集，在CollectMessage.php中第25行，
 	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
 	更改为
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
 
-	第二处	[用于返回答卷提交状态]
-	在SubmitForm.php中第16行
+第二处	[用于返回答卷提交状态]
+在SubmitForm.php中第16行
 	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
 	更改为
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
 这样设计可以满足你同时使用不同推送方式A_A
 
-	BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可直接无视。
-	使用脚本获取cookie有局限性，详情见API服务器篇
+BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可直接无视。
+使用脚本获取cookie有局限性，详情见API服务器篇
 
-4,学校URL填写：
+5,学校URL填写：
 因为在每次登录时适配不同学校的中查找list获得学校的host需要遍历全国各个
 学校直到找到你的学校为止。如果只设置了用户信息，默认只查找并显示你所填写学校的链接。
 如果你的学校排名较后，这个过程会消耗大量内存，CPU资源。
