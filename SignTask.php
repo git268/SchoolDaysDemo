@@ -8,7 +8,7 @@ function getSignTasks($user){
     echo"<br>第一次请求获取cookie<br>";
     $params = ['login_url'=> $apis['login-url'], 'needcaptcha_url'=> '',
         'captcha_url'=> '', 'username'=> $user['username'], 'password'=> $user['password']];
-    $cookie = SendRequest($apis['login-api'], [], $params);//从子墨服务器获取cookie
+    $cookie = json_decode(SendRequest($apis['login-api'], [], $params), true);//从子墨服务器获取cookie
     //$cookie = StartLogin();//从本地获取cookie
     $headers = Headers($cookie['cookies']);//获取请求头部
     print_r($cookie);
