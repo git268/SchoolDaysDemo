@@ -243,5 +243,5 @@ Config.php中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时
 观察日志到哪一步时没有结果或异常，如看到['msg']中出现SUCCESS以外的文本
 打印的任务表单与你想要填写的内容是否正确。
 
-## 给个star吧
+## 自己给自己star
 
