@@ -238,9 +238,11 @@ Config.php中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时
 
 若有其他报错，签到任务请打开SignTask.php，信息收集任务打开CollectMessage.php
 找出全部的	
-	print_r(xxx)   	
-去掉他们前面的注释，再次执行
-观察日志到哪一步时没有结果或异常，如看到['msg']中出现SUCCESS以外的文本
+
+	print_r(xxx);
+	
+去掉他们前面的`//`，再次执行
+观察日志到哪一步时没有结果或异常，如看到`['msg']`中出现SUCCESS以外的文本
 打印的任务表单与你想要填写的内容是否正确。
 
 ## 自己给自己star
