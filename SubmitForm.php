@@ -19,11 +19,9 @@ function SubmitTask($url, $cookie, $form, $type){
 function SignForm(){
     $user = User();
     $form = [   'signPhotoUrl'=> null,  //暂不支持图片上传
-        'extraFieldItems'=> [ '37.2℃及以下',
-            '健康',
-            '否',
-            '否',
-            '是' ],
+        'extraFieldItems'=> [  '10kg以下',
+                               '周八',
+                               '否'],
         'signInstanceWid'=> '', 'longitude'=> $user['lon'], 'latitude'=> $user['lat'], 'isMalposition'=> '0',
         'abnormalReason'=> $user['abnormalReason'], 'position'=> $user['address'], 'uaIsCpadaily'=> true];
     return $form;
