@@ -14,12 +14,12 @@ function getSignTasks($user){
     print_r($cookie);
     echo"<br>第二次请求获取签到任务<br>";
     $datas = json_decode(SendRequest($apis['datas-url'], $headers, json_encode($params)), true);//获取任务
-    print_r($datas);
+    //print_r($datas);
     $latestTask = $datas ['datas']['unSignedTasks'][0];
     $params = ['signInstanceWid'=>$latestTask['signInstanceWid'],'signWid'=>$latestTask['signWid']];
     echo"<br>当前任务<br>";
     $res = json_decode(SendRequest($apis['task-url'], $headers, json_encode($params)), true)['datas'];
-    print_r($res);
+    //print_r($res);
     if(!isset($res['signInstanceWid']) || empty($res['signInstanceWid'])){//判断有无任务
         $title = '当前没有签到任务';
         if(empty($cookie))$title = '模拟登录API超时或云端被禁用，错误代码：'.$cookie['msg'];
