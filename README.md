@@ -24,6 +24,7 @@
 	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
 替换为
+
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
 
 第二处	[用于返回答卷提交状态]  
@@ -31,6 +32,7 @@
 	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
 同理，替换为
+
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
 这样设计可以满足你同时使用不同推送方式A_A
 
