@@ -5,7 +5,7 @@
 要各种麻烦的依赖。本代码根据[子墨大佬](https://github.com/ZimoLoveShuang/auto-sign)的方案移植成~~世界上最好的语言~~，经过多次版本更替，
 移植了其绝大部分功能，免除依赖，支持信息收集与签到及部分学校的模拟登录。
 
-### 部署方法：
+## 部署方法：
 
 1,填写Config.php中User()的信息：
 账号	密码	经/纬度[精确到小数点后5位]	学校全称	定位状态    
@@ -23,14 +23,14 @@
 若为信息收集，在CollectMessage.php中第25行，
 	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
-	更改为
+替换为
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
 
 第二处	[用于返回答卷提交状态]
 在SubmitForm.php中第16行
 	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
-	更改为
+同理，替换为
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
 这样设计可以满足你同时使用不同推送方式A_A
 
@@ -157,6 +157,45 @@ A: 早餐	B: 午餐	C: 晚餐
 填写格式注意：
 签到暂不支持上传图片，~~因为我懒~~，信息收集的图片上传理论上可行，但需要另行创建与本项目处于同一目录下
 的文件夹存放图片，文件夹默认名称images。
-答卷所有符号都必须使用英文符号，除文本外不能有多余空格除最后一
+答卷所有符号都必须使用英文符号，答案数组除文本外不能有多余空格除最后一
 项外每一项末尾都要添加英文逗号，且顺序与收集的问题必须完全一致。
 
+
+## API服务器篇
+
+由于使用人数多及服务器维护费用高昂，
+Config.php中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时导致无法返回所需cookie
+解决办法有如下2种：
+
+### 使用自行架设的服务器，
+即将Config.php中SignAPIS、CollectAPIS的
+
+	'login-api'=>'http://你的服务器IP地址:端口号/wisedu-unified-login-api-v1.0/api/login'  
+[架设方法](https://github.com/ZimoLoveShuang/wisedu-unified-login-api)
+
+### 使用本脚本自带的SimulationLogin.php
+本PHP文件子墨API的部分功能整合在一起，但并未适配全部学校。
+先说局限性，在配置填写中，我们在填写学校URL步骤时控制台会输出如下
+
+	Array ( [idsUrl] => https://gipc.campusphere.net/iap [scheme] => https [host] => gipc.campusphere.net )
+其中因工程量浩大，只适配了[idsUrl]的后缀为/iap的学校，因此如果你的学校不是这种结尾，请使用第一种办法
+或者你可以参考本代码以及上述[架设方法](https://github.com/ZimoLoveShuang/wisedu-unified-login-api)中的逻辑将其他学校也
+整合在一起。
+
+
+使用方法
+1，注册百度账号，进入百度智能云控制台
+https://login.bce.baidu.com/?redirect=https%3A%2F%2Fconsole.bce.baidu.com%2F
+创建普通版文字识别服务[每天免费5000次那个]
+
+2，填写Config.php中ToolsKey()关于'BaiDuOCRKey'具体信息：
+client_id ：百度OCR API KEY	以及	client_secret ：百度OCR Secret KEY
+
+3，替换代码
+若为签到任务，找到SignTask.php中第11，12行
+若为信息收集，找到CollectMessage.php同样位置：
+    $cookie = SendRequest($apis['login-api'], [], $params);//从子墨服务器获取cookie
+    //$cookie = StartLogin();//从本地获取cookie
+将其更改为
+    //$cookie = SendRequest($apis['login-api'], [], $params);//从子墨服务器获取cookie
+    $cookie = StartLogin();//从本地获取cookie
