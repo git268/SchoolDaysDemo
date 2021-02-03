@@ -17,8 +17,8 @@
 'QmsgKey'：     Qmsg酱key
 两者皆用于消息推送，使用哪个填哪个，默认使用Qmsg酱
 
-3,若要更改推送方式，本脚本有2处推送运行结果，都需更改
-第一处	[用于返回任务异常状态]
+3,若要更改推送方式，本脚本有2处推送运行结果，都需更改。  
+第一处	[用于返回任务异常状态]  
 若为签到任务，在SignTask.php中第26行，
 若为信息收集，在CollectMessage.php中第25行，
 	
@@ -26,7 +26,7 @@
 替换为
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
 
-第二处	[用于返回答卷提交状态]
+第二处	[用于返回答卷提交状态]  
 在SubmitForm.php中第16行
 	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
