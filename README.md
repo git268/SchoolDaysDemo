@@ -7,10 +7,10 @@
 
 ## 部署方法：
 
-1,填写Config.php中User()的信息：
+1,填写`Config.php`中User()的信息：
 账号	密码	经/纬度[精确到小数点后5位]	学校全称	定位状态    
 
-2,填写Config.php中ToolsKey()其他工具信息：
+2,填写`Config.php`中ToolsKey()其他工具信息：
 
 脚本运行结果推送：
 'ServerChanKey' ： Server酱油key
@@ -19,8 +19,8 @@
 
 3,若要更改推送方式，本脚本有2处推送运行结果，都需更改。  
 第一处	[用于返回任务异常状态]  
-若为签到任务，在SignTask.php中第26行，
-若为信息收集，在CollectMessage.php中第25行，
+若为签到任务，在`SignTask.php`中第26行，
+若为信息收集，在`CollectMessage.php`中第25行，
 	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
 替换为
@@ -28,7 +28,7 @@
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
 
 第二处	[用于返回答卷提交状态]  
-在SubmitForm.php中第16行
+在`SubmitForm.php`中第16行
 	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
 同理，替换为
@@ -46,7 +46,7 @@
 
 	main_handler();
 
-6，校URL填写：
+6，学校URL填写：
 因为在每次登录时适配不同学校的中查找list获得学校的host需要遍历全国各个
 学校直到找到你的学校为止。如果只设置了用户信息，默认只查找并显示你所填写学校的链接。
 如果你的学校排名较后，这个过程会消耗大量内存，CPU资源。
@@ -99,7 +99,7 @@
 请先完成配置填写中的步骤
 
 适用于签到，下列为默认问题，用于展示样本，暂不支持图片上传，可适当增删改。
-签到答卷在SubmitForm.php中SignForm方法中
+签到答卷在`SubmitForm.php`中SignForm方法中
 
 	1：今天你的体重是多？  
 	答：10kg以下
@@ -119,7 +119,7 @@
 			 
 ### 信息收集答卷填写
 适用于信息收集，下列问题用于展示不同问题的答案样本，可适当增删改。
-信息收集答卷在SubmitForm.php中CollectForm方法中
+信息收集答卷在`SubmitForm.php`中CollectForm方法中
 
 	1：你的籍贯是（以户口本为准）	[三级联动，省市区三项选择]  
 	答：xx省/xx市/xx区
@@ -158,7 +158,7 @@
 		    
 填写格式注意：
 签到暂不支持上传图片，~~因为我懒~~，信息收集的图片上传理论上可行，但需要另行创建与本项目处于同一目录下
-的文件夹存放图片，文件夹默认名称images。
+的文件夹存放图片，文件夹默认名称`images`。
 答卷所有符号都必须使用英文符号，答案数组除文本外不能有多余空格除最后一
 项外每一项末尾都要添加英文逗号，且顺序与收集的问题必须完全一致。
 
@@ -166,7 +166,7 @@
 ## API服务器篇
 
 由于使用人数多及服务器维护费用高昂，
-Config.php中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时导致无法返回所需cookie
+`Config.php`中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时导致无法返回所需cookie
 解决办法有如下2种：
 
 ### 使用自行架设的服务器，
@@ -175,7 +175,7 @@ Config.php中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时
 	'login-api'=>'http://你的服务器IP地址:端口号/wisedu-unified-login-api-v1.0/api/login'  
 [架设方法](https://github.com/ZimoLoveShuang/wisedu-unified-login-api)
 
-### 使用本脚本自带的SimulationLogin.php
+### 使用本脚本自带的`SimulationLogin.php`
 本PHP文件子墨API的部分功能整合在一起，但并未适配全部学校。
 先说局限性，在配置填写中，我们在填写学校URL步骤时控制台会输出如下
 
@@ -186,19 +186,19 @@ Config.php中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时
 
 
 ### 使用方法
-这一步骤嫌麻烦可以先跳过申请key尝试直接执行，大部分学校需要验证码的原因都是短时间登录过于频繁或密码频繁错误。
+这一步骤嫌麻烦可以先跳过申请key尝试直接执行，大部分学校需要验证码的原因都是短时间登录过于频繁或密码频繁错误。  
 1，注册百度账号，进入百度智能云控制台
 
 	https://login.bce.baidu.com/?redirect=https%3A%2F%2Fconsole.bce.baidu.com%2F
 创建普通版文字识别服务，每天免费5000次那个。
 
-2，填写Config.php中ToolsKey()关于'BaiDuOCRKey'具体信息：
+2，填写`Config.php`中ToolsKey()关于'BaiDuOCRKey'具体信息：
 
 	client_id ：百度OCR API KEY	以及	client_secret ：百度OCR Secret KEY
 
 3，替换代码
-若为签到任务，找到SignTask.php中第11，12行
-若为信息收集，找到CollectMessage.php同样位置：
+若为签到任务，找到`SignTask.php`中第11，12行
+若为信息收集，找到`CollectMessage.php`同样位置：
 
 	$cookie = SendRequest($apis['login-api'], [], $params);//从子墨服务器获取cookie
 	//$cookie = StartLogin();//从本地获取cookie
@@ -222,10 +222,10 @@ Config.php中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时
 一般会更改为
 
 	'datas-url'=>'https://'.$url['host'].'/wec-counselor-sign-apps/stu/sign/xxx'
-且DES加密的密钥也会跟随版本更新密钥在ToolsHelper.php中
+且DES加密的密钥也会跟随版本更新密钥在`ToolsHelper.php`中
 
 	DESEncrypt($text, $key = 'b3L26XNL')
-此处$key = 'b3L26XNL'就是密钥  
+此处`$key = 'b3L26XNL'`就是密钥  
 
 模拟登录API问题请阅读API服务器篇
 
@@ -236,7 +236,7 @@ Config.php中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时
 若此时执行信息收集，日志/微信推送会显示报错：	自动填写信息收失败，原因是：该收集已填写无需再次填写
 上述报错是正常情况，请勿在一个任务时间段内多次执行
 
-若有其他报错，签到任务请打开SignTask.php，信息收集任务打开CollectMessage.php
+若有其他报错，签到任务请打开`SignTask.php`，信息收集任务打开`CollectMessage.php`
 找出全部的	
 
 	print_r(xxx);
