@@ -42,35 +42,38 @@
 中第一个加入的学校  甘肃工业职业技术学院  为例
 
 控制台会输出
-Array ( [idsUrl] => https://gipc.campusphere.net/iap [scheme] => https [host] => gipc.campusphere.net )
+
+	Array ( [idsUrl] => https://gipc.campusphere.net/iap [scheme] => https [host] => gipc.campusphere.net )
 
 找到index.php主函数function main_handler()
 若你的今日校园任务是签到，
 可替换为[必须确保个人信息没有填写错误]
-function main_handler(){
-    $_POST['school'] = [   
-        'idsUrl' => 'https://gipc.campusphere.net/iap',
-        'scheme' => 'https',
-        'host' => 'gipc.campusphere.net'    ];
-    ToolsKey();
-    //执行签到
-    getSignTasks(User());
-    $_POST = [];//清空超全局变量
-    echo '<br>执行完毕!';
-}
+
+	function main_handler(){
+	    $_POST['school'] = [   
+		'idsUrl' => 'https://gipc.campusphere.net/iap',
+		'scheme' => 'https',
+		'host' => 'gipc.campusphere.net'    ];
+	    ToolsKey();
+	    //执行签到
+	    getSignTasks(User());
+	    $_POST = [];//清空超全局变量
+	    echo '<br>执行完毕!';
+	}
 若你的今日校园任务是信息收集，
 可替换为[必须确保个人信息没有填写错误]
-function main_handler(){
-   $_POST['school'] = [   
-        'idsUrl' => 'https://gipc.campusphere.net/iap',
-        'scheme' => 'https',
-        'host' => 'gipc.campusphere.net'    ];
-    ToolsKey();
-    //执行信息收集
-    getCollectTasks(User());
-    $_POST = [];//清空超全局变量
-    echo '<br>执行完毕!';
-}
+
+	function main_handler(){
+	   $_POST['school'] = [   
+		'idsUrl' => 'https://gipc.campusphere.net/iap',
+		'scheme' => 'https',
+		'host' => 'gipc.campusphere.net'    ];
+	    ToolsKey();
+	    //执行信息收集
+	    getCollectTasks(User());
+	    $_POST = [];//清空超全局变量
+	    echo '<br>执行完毕!';
+	}
 注意URL必须使用英语单引号''填写，不能使用英语双引号"" 
 中文双引号“”中文单引号‘’，不能有多余空格，注意末尾逗号！！！
 
