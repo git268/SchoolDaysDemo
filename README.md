@@ -12,9 +12,9 @@
 
 2,填写`Config.php`中ToolsKey()其他工具信息：
 
-脚本运行结果推送：
-'ServerChanKey' ： Server酱油key
-'QmsgKey'：     Qmsg酱key
+脚本运行结果推送：  
+'ServerChanKey' ： Server酱油key  
+'QmsgKey'：     Qmsg酱key  
 两者皆用于消息推送，使用哪个填哪个，默认使用Qmsg酱
 
 3,若要更改推送方式，本脚本有2处推送运行结果，都需更改。  
@@ -59,7 +59,7 @@
 
 	Array ( [idsUrl] => https://gipc.campusphere.net/iap [scheme] => https [host] => gipc.campusphere.net )
 
-找到index.php主函数function main_handler()
+找到`index.php`主函数function main_handler()
 若你的今日校园任务是签到，
 可替换为[必须确保个人信息没有填写错误]
 
@@ -170,7 +170,7 @@
 解决办法有如下2种：
 
 ### 使用自行架设的服务器，
-即将Config.php中SignAPIS、CollectAPIS的
+即将`Config.php`中SignAPIS、CollectAPIS的
 
 	'login-api'=>'http://你的服务器IP地址:端口号/wisedu-unified-login-api-v1.0/api/login'  
 [架设方法](https://github.com/ZimoLoveShuang/wisedu-unified-login-api)
@@ -231,10 +231,10 @@
 
 
 ### 简单自行排查
-若你已提交任务且任务时间未结束，会产生以下的错误
-若此时执行签到任务，日志/微信推送会显示报错：	自动签到失败，原因是：请求参数SignInstanceWid为空
-若此时执行信息收集，日志/微信推送会显示报错：	自动填写信息收失败，原因是：该收集已填写无需再次填写
-上述报错是正常情况，请勿在一个任务时间段内多次执行
+若你已提交任务且任务时间未结束，会产生以下的错误  
+若此时执行签到任务，日志/微信推送会显示报错：	自动签到失败，原因是：请求参数SignInstanceWid为空  
+若此时执行信息收集，日志/微信推送会显示报错：	自动填写信息收失败，原因是：该收集已填写无需再次填写  
+上述报错是正常情况，请勿在一个任务时间段内多次执行  
 
 若有其他报错，签到任务请打开`SignTask.php`，信息收集任务打开`CollectMessage.php`
 找出全部的	
