@@ -20,12 +20,14 @@
 	第一处	[用于返回任务异常状态]
 	若为签到任务，在SignTask.php中第26行，
 	若为信息收集，在CollectMessage.php中第25行，
+	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
 	更改为
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
 
 	第二处	[用于返回答卷提交状态]
 	在SubmitForm.php中第16行
+	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
 	更改为
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
