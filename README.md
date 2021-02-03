@@ -99,14 +99,14 @@
 适用于签到，下列为默认问题，用于展示样本，暂不支持图片上传，可适当增删改。
 签到答卷在SubmitForm.php中SignForm方法中
 
-1：今天你的体重是多？  
-答：10kg以下
+	1：今天你的体重是多？  
+	答：10kg以下
 
-2：今天周几？  
-答：周八
+	2：今天周几？  
+	答：周八
 
-3：近14天你有无吃早餐？  
-答：否
+	3：近14天你有无吃早餐？  
+	答：否
 
 
 样卷格式：
@@ -119,29 +119,29 @@
 适用于信息收集，下列问题用于展示不同问题的答案样本，可适当增删改。
 信息收集答卷在SubmitForm.php中CollectForm方法中
 
-1：你的籍贯是（以户口本为准）	[三级联动，省市区三项选择]  
-答：xx省/xx市/xx区
+	1：你的籍贯是（以户口本为准）	[三级联动，省市区三项选择]  
+	答：xx省/xx市/xx区
 
-2：假期常住地（请具体到门牌号）	[普通文本]  
-答：xx省xx市xx区xx路xx号
+	2：假期常住地（请具体到门牌号）	[普通文本]  
+	答：xx省xx市xx区xx路xx号
 
-3：最后一科考试的时间		[时间表选择]  
-答：2077-01-01/12:00
-	
-4：你去往目的地的交通方式		[单项选择]  
-A: 公交	B: 地铁	C: 步行	D: 飞机  
-答：['公交']
+	3：最后一科考试的时间		[时间表选择]  
+	答：2077-01-01/12:00
 
-5：你昨天吃了哪几餐？		[多项选择]  
-A: 早餐	B: 午餐	C: 晚餐  
-答：['早餐', '午餐', '晚餐']
+	4：你去往目的地的交通方式		[单项选择]  
+	A: 公交	B: 地铁	C: 步行	D: 飞机  
+	答：['公交']
 
-6：请上传打卡照片			[图片]  
-答："../images/CSGO.png"  
+	5：你昨天吃了哪几餐？		[多项选择]  
+	A: 早餐	B: 午餐	C: 晚餐  
+	答：['早餐', '午餐', '晚餐']
 
-7：有无咳嗽，发烧等身体不适？	[判断题]  
-是	否  
-答：['否']
+	6：请上传打卡照片			[图片]  
+	答："../images/CSGO.png"  
+
+	7：有无咳嗽，发烧等身体不适？	[判断题]  
+	是	否  
+	答：['否']
 
 样卷格式：
 
@@ -183,19 +183,24 @@ Config.php中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时
 整合在一起。
 
 
-使用方法
+### 使用方法
+这一步骤嫌麻烦可以先跳过申请key尝试直接执行，大部分学校需要验证码的原因都是短时间登录过于频繁或密码频繁错误。
 1，注册百度账号，进入百度智能云控制台
-https://login.bce.baidu.com/?redirect=https%3A%2F%2Fconsole.bce.baidu.com%2F
-创建普通版文字识别服务[每天免费5000次那个]
+
+	https://login.bce.baidu.com/?redirect=https%3A%2F%2Fconsole.bce.baidu.com%2F
+创建普通版文字识别服务，每天免费5000次那个。
 
 2，填写Config.php中ToolsKey()关于'BaiDuOCRKey'具体信息：
-client_id ：百度OCR API KEY	以及	client_secret ：百度OCR Secret KEY
+
+	client_id ：百度OCR API KEY	以及	client_secret ：百度OCR Secret KEY
 
 3，替换代码
 若为签到任务，找到SignTask.php中第11，12行
 若为信息收集，找到CollectMessage.php同样位置：
-    $cookie = SendRequest($apis['login-api'], [], $params);//从子墨服务器获取cookie
-    //$cookie = StartLogin();//从本地获取cookie
+
+	$cookie = SendRequest($apis['login-api'], [], $params);//从子墨服务器获取cookie
+	//$cookie = StartLogin();//从本地获取cookie
 将其更改为
-    //$cookie = SendRequest($apis['login-api'], [], $params);//从子墨服务器获取cookie
-    $cookie = StartLogin();//从本地获取cookie
+
+	//$cookie = SendRequest($apis['login-api'], [], $params);//从子墨服务器获取cookie
+	$cookie = StartLogin();//从本地获取cookie
