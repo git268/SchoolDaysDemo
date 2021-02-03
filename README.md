@@ -86,8 +86,8 @@
 	    $_POST = [];//清空超全局变量
 	    echo '<br>执行完毕!';
 	}
-注意URL必须使用英语单引号''填写，不能使用英语双引号"" 
-中文双引号“”中文单引号‘’，不能有多余空格，注意末尾逗号！！！
+注意URL`必须`使用英语单引号''填写，`不能`使用`英语双引号""`，
+中文双引号“”，中文单引号‘’，`不能`有多余`空格`，注意末尾逗号！！！
 
 至此，以后每次执行不再从庞大的list列表中搜索你所在学校的名字，节约大量资源。
 
@@ -204,3 +204,40 @@ Config.php中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时
 
 	//$cookie = SendRequest($apis['login-api'], [], $params);//从子墨服务器获取cookie
 	$cookie = StartLogin();//从本地获取cookie
+
+## 简单错误排查
+由于今日校园为了防止脚本自带提交任务，大概每隔2-4星期会更改一次链接
+这些链接都在Config.php中的签到/信息收集API/获取校园信息URL中
+如在大约20年11月更新时，获取校园信息URL中
+
+	'list'=> 'https://mobile.campushoy.com/v6/config/guest/tenant/list'
+更改为
+
+	'list'=> 'https://xxx/v6/config/guest/tenant/list'
+而签到API中的
+
+	'datas-url'=>'https://'.$url['host'].'/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'
+一般会更改为
+
+	'datas-url'=>'https://'.$url['host'].'/wec-counselor-sign-apps/stu/sign/xxx'
+且DES加密的密钥也会跟随版本更新密钥在ToolsHelper.php中
+
+	DESEncrypt($text, $key = 'b3L26XNL')
+此处$key = 'b3L26XNL'就是密钥  
+
+模拟登录API问题请阅读API服务器篇
+
+
+### 简单的错误排查
+若你已提交任务且任务时间未结束，会产生以下的错误
+若此时执行签到任务，日志/微信推送会显示报错：	自动签到失败，原因是：请求参数SignInstanceWid为空
+若此时执行信息收集，日志/微信推送会显示报错：	自动填写信息收失败，原因是：该收集已填写无需再次填写
+上述报错是正常情况，请勿在一个任务时间段内多次执行
+
+若有其他报错，签到任务请打开SignTask.php，信息收集任务打开CollectMessage.php
+找出全部的	
+	print_r(xxx)   	
+去掉他们前面的注释，再次执行
+观察日志到哪一步时没有结果或异常，如看到['msg']中出现SUCCESS以外的文本
+打印的任务表单与你想要填写的内容是否正确。
+
