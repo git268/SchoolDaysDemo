@@ -222,7 +222,7 @@
 一般会更改为
 
 	'datas-url'=>'https://'.$url['host'].'/wec-counselor-sign-apps/stu/sign/xxx'
-且DES加密的密钥也会跟随版本更新密钥在`ToolsHelper.php`中
+且DES加密的密钥也会跟随版本更新，密钥在`ToolsHelper.php`中
 
 	DESEncrypt($text, $key = 'b3L26XNL')
 此处`$key = 'b3L26XNL'`就是密钥  
