@@ -208,8 +208,8 @@
 	$cookie = StartLogin();//从本地获取cookie
 
 ## 简单错误排查
-由于今日校园为了防止脚本自带提交任务，大概每隔2-4星期会更改一次链接
-这些链接都在Config.php中的签到/信息收集API/获取校园信息URL中
+由于今日校园为了防止脚本自带提交任务，大概每隔2-4星期会更改一次链接  
+这些链接都在`Config.php`中的签到/信息收集API/获取校园信息URL中
 如在大约20年11月更新时，获取校园信息URL中
 
 	'list'=> 'https://mobile.campushoy.com/v6/config/guest/tenant/list'
