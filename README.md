@@ -240,7 +240,7 @@
 ### 使用方法
 在`SignTask.php`[签到]/`CollectMessage.php`[信息收集]的执行路径上，最好是第一个方法的第一行添加，如想延时5-30秒可以这样填写：
 
-	function getSignTasks/getCollectTasks(...){
+	function getSignTasks / getCollectTasks (...){
 		SleepTime(5, 30);//随机延时5-30秒
 		...
 	}
@@ -251,7 +251,7 @@
 	set_time_limit(100);//设置执行时间上限(100秒)
 若需紧急执行，请先在所有调用的`SleepTime(..);`前方更改为
 
-	//SleepTime(..);
+	//SleepTime(...);
 
 ### 今日校园反脚本案例介绍
 由于今日校园为了防止脚本自带提交任务，大概每隔2-4星期会更改一次链接  
