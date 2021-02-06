@@ -20,7 +20,7 @@ function getCollectTasks($user) {
     $schoolTaskWid = json_decode(SendRequest($apis['task-url'], $headers, json_encode(['collectorWid' => $collectWid])), true)['datas'];
     //判断有无信息收集
     if(!isset($schoolTaskWid['collector']['schoolTaskWid']) || empty($schoolTaskWid['collector']['schoolTaskWid'])){
-        $title = '当前没有签到任务';
+        $title = '当前没有信息收集任务';
         if(empty($cookie))$title = '模拟登录API超时或云端被禁用，错误代码：'.$cookie['msg'];
         print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
     }else{
