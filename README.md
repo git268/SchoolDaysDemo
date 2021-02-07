@@ -73,7 +73,7 @@
 		'host' => 'gipc.campusphere.net'    ];
 	    ToolsKey();
 	    //执行签到
-	    getSignTasks($user, SignAPIS());
+	    getSignTasks(User(), SignAPIS());
 	    $_POST = [];//清空超全局变量
 	    echo '<br>执行完毕!';
 	}
@@ -87,7 +87,7 @@
 		'host' => 'gipc.campusphere.net'    ];
 	    ToolsKey();
 	    //执行信息收集
-	    getCollectTasks($user, CollectAPIS());
+	    getCollectTasks(User(), CollectAPIS());
 	    $_POST = [];//清空超全局变量
 	    echo '<br>执行完毕!';
 	}
