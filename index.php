@@ -3,6 +3,7 @@ require_once  'Config.php';
 require_once 'SignTask.php';
 require_once 'CollectMessage.php';
 date_default_timezone_set('PRC');//设置时间
+set_time_limit(100);//设置执行时间上限(100秒)
 function main_handler(){
     $user = User();
     $url = SchoolMessageURL();
@@ -13,14 +14,12 @@ function main_handler(){
         $msg = json_decode(file_get_contents($url['info'].'?ids='.$result), true);
         FindAllUrl($msg['data'][0]);
         //ToolsKey();
-        //执行签到
-        //getSignTasks($user);
-        //执行信息收集
-        //getCollectTasks($user);
+        //getSignTasks($user, SignAPIS());//执行签到
+        //getCollectTasks($user, CollectAPIS());//执行信息收集
     }else{
         echo $result;
     }
-    $_POST = [];//清空session
+    $_POST = [];//清空超全局变量
     echo '<br>执行完毕!';
 }
 //查找是否支持该学校
