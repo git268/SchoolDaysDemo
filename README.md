@@ -18,23 +18,14 @@
 'QmsgKey'：     Qmsg酱key  
 两者皆用于消息推送，使用哪个填哪个，默认使用Qmsg酱
 
-3,若要更改推送方式，本脚本有2处推送运行结果，都需更改。  
-第一处	[用于返回任务异常状态]  
-若为签到任务，在`SignTask.php`中第26行，
-若为信息收集，在`CollectMessage.php`中第25行，
+3,若要更改推送方式[只支持ServerChan/Qmsg]，本脚本有2处推送运行结果，默认使用Qmsg，更改推送方式如下。  
+将`SignTask.php`、`CollectMessage.php`及`SubmitForm.phph`中所有的：
 	
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
 替换为
 
 	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
 
-第二处	[用于返回答卷提交状态]  
-在`SubmitForm.php`中第16行
-	
-	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
-同理，替换为
-
-	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
 这样设计可以满足你同时使用不同推送方式A_A
 
 4，BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可直接无视。
@@ -82,7 +73,7 @@
 		'host' => 'gipc.campusphere.net'    ];
 	    ToolsKey();
 	    //执行签到
-	    getSignTasks(User());
+	    getSignTasks($user, SignAPIS());
 	    $_POST = [];//清空超全局变量
 	    echo '<br>执行完毕!';
 	}
@@ -96,7 +87,7 @@
 		'host' => 'gipc.campusphere.net'    ];
 	    ToolsKey();
 	    //执行信息收集
-	    getCollectTasks(User());
+	    getCollectTasks($user, CollectAPIS());
 	    $_POST = [];//清空超全局变量
 	    echo '<br>执行完毕!';
 	}
