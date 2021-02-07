@@ -1,10 +1,8 @@
 <?php
-require_once  'Config.php';
 require_once 'SubmitForm.php';
 require_once 'ToolsHelper.php';
 require_once 'SimulationLogin.php';
-function getSignTasks($user){
-    $apis = SignAPIS();//获取对应API
+function getSignTasks($user, $apis){
     echo"<br>第一次请求获取cookie<br>";
     $params = ['login_url'=> $apis['login-url'], 'needcaptcha_url'=> '',
         'captcha_url'=> '', 'username'=> $user['username'], 'password'=> $user['password']];
@@ -13,37 +11,31 @@ function getSignTasks($user){
     $headers = Headers($cookie['cookies']);//获取请求头部
     print_r($cookie);
     echo"<br>第二次请求获取签到任务<br>";
-    $datas = json_decode(SendRequest($apis['datas-url'], $headers, json_encode($params)), true);//获取任务
-    //print_r($datas);
-    $latestTask = $datas ['datas']['unSignedTasks'][0];
-    $params = ['signInstanceWid'=>$latestTask['signInstanceWid'],'signWid'=>$latestTask['signWid']];
-    echo"<br>当前任务<br>";
-    $res = json_decode(SendRequest($apis['task-url'], $headers, json_encode($params)), true)['datas'];
-    //print_r($res);
-    if(!isset($res['signInstanceWid']) || empty($res['signInstanceWid'])){//判断有无任务
-        $title = '当前没有签到任务';
-        if(empty($cookie))$title = '模拟登录API超时或云端被禁用，错误代码：'.$cookie['msg'];
-        print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Qmsg酱推送
-    }else{
-        $form = SignForm();
+    $datas = json_decode(SendRequest($apis['datas-url'], $headers, json_encode($params)), true)['datas']['unSignedTasks'];//获取任务
+    print_r($datas);
+    if(isset($datas[0])){
+        $params = ['signInstanceWid'=> $datas[0]['signInstanceWid'],'signWid'=> $datas[0]['signWid']];
+        echo"<br>当前任务<br>";
+        $res = json_decode(SendRequest($apis['task-url'], $headers, json_encode($params)), true)['datas'];
+        //print_r($res);
+        $form = SignForm($res['signInstanceWid'], $user['lat'], $user['lon']);
         echo"<br>填充表单<br>";
-        $form['signInstanceWid'] = $res['signInstanceWid'];
-        if($res['isNeedExtra'] == 1){//填充附加信息
-            $form['extraFieldItems'] = FillTaskKey($res['extraField'], $form['extraFieldItems']);
-        }
+        if($res['isNeedExtra'] == 1)$form['extraFieldItems'] = FillTaskKey($res['extraField'], $form['extraFieldItems']);
         print_r($form);
         SubmitTask($apis['submit-url'], $cookie['cookies'], $form, '签到');//提交表单信息
+    }else {
+        $title = '当前没有签到任务。';
+        if($cookie['msg'] != 'login success!') $title = '模拟登录API超时或云端被禁用，错误代码：' . $cookie['msg'];
+        print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Qmsg酱推送
     }
 }
 //填写任务答案
-function FillTaskKey($fillarr, $keyarr){//查找额外项wid并返回ID数组
-    $k1 = 0;
-    $correctkey = [];//定义答案数组
-    foreach ($fillarr as $fillkey => $fillvalue) {
-        foreach ($fillvalue['extraFieldItems'] as $itemkey => $itemvalue){
-            if ($itemvalue['content'] == $keyarr[$k1]) {
-                $correctkey[] = ['extraFieldItemValue'=> $keyarr[$k1], 'extraFieldItemWid'=> $itemvalue['wid']];//填充fieldItems数组
-                $k1++;
+function FillTaskKey($fillarr, $keyarr, $flag = 0, $correctkey = []){
+    foreach ($fillarr as $fillkey => $fillvalue) {//遍历附加项项答卷结构
+        foreach ($fillvalue['extraFieldItems'] as $itemkey => $itemvalue){//遍历选项
+            if ($itemvalue['content'] == $keyarr[$flag]) {//填充答案
+                $correctkey[] = ['extraFieldItemValue'=> $keyarr[$flag], 'extraFieldItemWid'=> $itemvalue['wid']];//填充fieldItems数组
+                $flag++;
                 break;
             }
         }
