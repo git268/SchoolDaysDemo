@@ -16,13 +16,13 @@ function SubmitTask($url, $cookie, $form, $type){
     print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
 }
 //签到任务答卷
-function SignForm(){
+function SignForm($wid, $lat, $lon){
     $user = User();
     $form = [   'signPhotoUrl'=> null,  //暂不支持图片上传
-        'extraFieldItems'=> [  '10kg以下',
-                               '周八',
-                               '否'],
-        'signInstanceWid'=> '', 'longitude'=> $user['lon'], 'latitude'=> $user['lat'], 'isMalposition'=> '0',
+                'extraFieldItems'=> [  '10kg以下',
+                    '周八',
+                    '否'],
+        'signInstanceWid'=> $wid, 'longitude'=> $lon, 'latitude'=> $lat, 'isMalposition'=> '0',
         'abnormalReason'=> $user['abnormalReason'], 'position'=> $user['address'], 'uaIsCpadaily'=> true];
     return $form;
 }
