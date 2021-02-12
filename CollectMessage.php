@@ -28,7 +28,7 @@ function getCollectTasks($user, $apis) {
         SubmitTask($apis['submit-url'], $cookie['cookies'], $form, $user, '信息收集');//提交表单
     }else{
         $title = '当前没有信息收集任务。';
-        if ($cookie['msg'] != 'SUCCESS')$title = '模拟登录API超时或云端被禁用，错误代码：'.$cookie['msg'];
+        if ($cookie['msg'] != 'login success!')$title = '模拟登录API超时或云端被禁用，错误代码：'.$cookie['msg'];
         print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
     }
 }
