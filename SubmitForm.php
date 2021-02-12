@@ -1,13 +1,13 @@
 <?php
 require_once 'Config.php';
 require_once 'ToolsHelper.php';
-function SubmitTask($url, $cookie, $form, $type){
-    $headers = '';
+function SubmitTask($url, $cookie, $form, $user, $type){
+    $headers = '';//初始化
     if($type == '信息收集'){
-        $headers = Headers2($cookie, RequestExtension('信息收集'));//信息收集表头
+        $headers = Headers2($cookie, RequestExtension($user, $type));//信息收集表头
         $headers[] = 'Host:'.$_POST['school']['host'];
     }else if($type == '签到'){
-        $headers = Headers2($cookie, RequestExtension());  //签到表头
+        $headers = Headers2($cookie, RequestExtension($user, $type));  //签到表头
     }
     echo"<br>答卷结果<br>";
     $message = json_decode(SendRequest($url, $headers, json_encode($form)), true);
@@ -16,21 +16,20 @@ function SubmitTask($url, $cookie, $form, $type){
     print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
 }
 //签到任务答卷
-function SignForm($wid, $lat, $lon){
-    $user = User();
+function SignForm($wid, $user){
     $form = [   'signPhotoUrl'=> null,  //暂不支持图片上传
-                'extraFieldItems'=> [  '10kg以下',
-                    '周八',
-                    '否'],
-        'signInstanceWid'=> $wid, 'longitude'=> $lon, 'latitude'=> $lat, 'isMalposition'=> '0',
-        'abnormalReason'=> $user['abnormalReason'], 'position'=> $user['address'], 'uaIsCpadaily'=> true];
+                'extraFieldItems'=> [   '10kg以下',
+                                          '周八',
+                                          '否'   ],
+        'signInstanceWid'=> $wid, 'longitude'=> $user['lon'], 'latitude'=> $user['lat'], 'isMalposition'=> '0',
+        'abnormalReason'=> $user['abnormalReason'], 'position'=> $user['address'], 'uaIsCpadaily'=> true ];
     return $form;
 }
 //信息收集答卷
-function CollectForm($formWid, $collectWid, $schoolTaskWid, $lat, $lon){
+function CollectForm($fwid, $cwid, $swid, $user){//三个必填wid+地址经纬度
     $data = [
-        'formWid'=> $formWid, 'address'=> User()['address'],
-        'collectWid'=> $collectWid, 'schoolTaskWid'=> $schoolTaskWid,
+        'formWid'=> $fwid, 'address'=> $user['address'],
+        'collectWid'=> $cwid, 'schoolTaskWid'=> $swid,
         'form'=> [
             'xx省/xx市/xx区',
             'xx省xx市xx区xx路xx号',
@@ -39,17 +38,16 @@ function CollectForm($formWid, $collectWid, $schoolTaskWid, $lat, $lon){
             ['早餐', '午餐', '晚餐'],
             "../images/CSGO.png",
             ['否']   ],
-        'uaIsCpadaily'=> true, 'latitude'=> $lat, 'longitude'=> $lon];
+        'uaIsCpadaily'=> true, 'latitude'=> $user['lat'], 'longitude'=> $user['lon'] ];
     return $data;
 }
 //Extension参数
-function RequestExtension($type = '签到'){
-    $user = User();
+function RequestExtension($user, $type, $extension=[]){
     if($type == '信息收集'){
         $extension = [  'model'=> 'OPPO R11 Plus', 'appVersion'=> '8.2.14', 'systemVersion'=> '7.0.1',
             'userId'=> $user['username'], 'systemName'=> 'android', 'lon'=> $user['lon'],
             'lat'=> $user['lat'], 'deviceId'=> UUID()   ];
-    }else{//两者加密后密文因键值顺序而并不相同，请勿更改
+    }else if($type == '签到'){//两者加密后密文因键值顺序而并不相同，请勿更改
         $extension = [  'appVersion' => '8.2.14', 'systemName' => 'android',  'model' => 'OPPO R11 Plus',
             'lon' => $user['lon'], 'systemVersion' => '7.0.1', 'deviceId' => UUID(),
             'lat' => $user['lat']  ];
