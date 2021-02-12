@@ -25,7 +25,7 @@ function getSignTasks($user, $apis){
         SubmitTask($apis['submit-url'], $cookie['cookies'], $form, '签到');//提交表单信息
     }else {
         $title = '当前没有签到任务。';
-        if($cookie['msg'] != 'login success!') $title = '模拟登录API超时或云端被禁用，错误代码：' . $cookie['msg'];
+        if($cookie['msg'] != 'SUCCESS') $title = '模拟登录API超时或云端被禁用，错误代码：' . $cookie['msg'];
         print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Qmsg酱推送
     }
 }
