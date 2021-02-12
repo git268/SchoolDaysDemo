@@ -4,8 +4,8 @@ require_once 'ToolsHelper.php';
 require_once 'SimulationLogin.php';
 function getCollectTasks($user, $apis) {
     echo "<br>第一次请求获取cookie<br>";
-    $params = [ 'login_url' => $apis['login-url'], 'needcaptcha_url' => '', 'captcha_url' => '',
-                'username' => $user['username'], 'password' => $user['password']    ];
+    $params = [ 'login_url'=> $apis['login-url'], 'needcaptcha_url'=> '', 'captcha_url'=> '',
+                'username'=> $user['username'], 'password'=> $user['password']    ];
     $cookie = json_decode(SendRequest($apis['login-api'], [], $params), true);//从子墨服务器获取cookie
     //$cookie = StartLogin();//从本地获取cookie
     $headers = Headers($cookie['cookies']);//获取请求头部
@@ -20,12 +20,12 @@ function getCollectTasks($user, $apis) {
         echo "<br>第三次请求具体信息收集任务<br>";
         $params = json_encode(['pageSize' => 100, 'pageNumber' => 1, 'formWid' => $formWid, 'collectorWid' => $collectWid]);
         $res = json_decode(SendRequest($apis['form-url'], $headers, $params), true);//获取信息收集详情
-        print_r($res);
+        //print_r($res);
         echo "<br>填充表单<br>";
-        $form = CollectForm($formWid, $collectWid, $schoolTaskWid['collector']['schoolTaskWid'], $user['lat'], $user['lon']);
+        $form = CollectForm($formWid, $collectWid, $schoolTaskWid['collector']['schoolTaskWid'], $user);
         $form['form'] = FillForm($res['datas']['rows'], $form['form']);
         print_r($form);
-        SubmitTask($apis['submit-url'], $cookie['cookies'], $form, '信息收集');//提交表单
+        SubmitTask($apis['submit-url'], $cookie['cookies'], $form, $user, '信息收集');//提交表单
     }else{
         $title = '当前没有信息收集任务。';
         if ($cookie['msg'] != 'SUCCESS')$title = '模拟登录API超时或云端被禁用，错误代码：'.$cookie['msg'];
