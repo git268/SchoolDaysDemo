@@ -17,12 +17,12 @@ function getSignTasks($user, $apis){
         $params = ['signInstanceWid'=> $datas[0]['signInstanceWid'],'signWid'=> $datas[0]['signWid']];
         echo"<br>当前任务<br>";
         $res = json_decode(SendRequest($apis['task-url'], $headers, json_encode($params)), true)['datas'];
-        //print_r($res);
-        $form = SignForm($res['signInstanceWid'], $user['lat'], $user['lon']);
+        print_r($res);
+        $form = SignForm($res['signInstanceWid'], $user);
         echo"<br>填充表单<br>";
         if($res['isNeedExtra'] == 1)$form['extraFieldItems'] = FillTaskKey($res['extraField'], $form['extraFieldItems']);
         print_r($form);
-        SubmitTask($apis['submit-url'], $cookie['cookies'], $form, '签到');//提交表单信息
+        SubmitTask($apis['submit-url'], $cookie['cookies'], $form, $user, '签到');//提交表单信息
     }else {
         $title = '当前没有签到任务。';
         if($cookie['msg'] != 'SUCCESS') $title = '模拟登录API超时或云端被禁用，错误代码：' . $cookie['msg'];
