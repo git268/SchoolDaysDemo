@@ -8,30 +8,22 @@
 
 ## 部署方法：
 
-1,填写`Config.php`中User()的信息：
+### 1,填写`Config.php`中User()的信息：
 账号	密码	经/纬度[精确到小数点后5位]	学校全称	定位状态    
 
-2,填写`Config.php`中ToolsKey()其他工具信息：
+### 2,填写`Config.php`中ToolsKey()其他工具信息：
 
-脚本运行结果推送：  
+#### 脚本运行结果推送：  
 'ServerChanKey' ： Server酱油key  
 'QmsgKey'：     Qmsg酱key  
 两者皆用于消息推送，使用哪个填哪个，默认使用Qmsg酱
 
-3,若要更改推送方式[只支持ServerChan/Qmsg]，本脚本有2处推送运行结果，默认使用Qmsg，更改推送方式如下。  
-将`SignTask.php`、`CollectMessage.php`及`SubmitForm.phph`中所有的：
-	
-	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg'));   //Qmsg酱推送
-替换为
-
-	print_r(SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan'));   //Server酱推送
-
-这样设计可以满足你同时使用不同推送方式A_A
-
-4，BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可直接无视。
+#### 百度OCR识别key
+BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可直接无视。
 使用脚本获取cookie有局限性，详情见API服务器篇
 
-5，执行环境：PHP7。若在非云函数下执行，请将index.php中最后一行
+### 4，执行环境：PHP7。
+若在非云函数下执行，请将index.php中最后一行
 
 	//main_handler();
 替换为
@@ -49,7 +41,7 @@
 	}
 若部署环境为腾讯云云函数，不需要修改主函数。
 
-6，学校URL填写：
+### 5，学校URL填写：
 因为在每次登录时适配不同学校的中查找list获得学校的host需要遍历全国各个
 学校直到找到你的学校为止。如果只设置了用户信息，默认只查找并显示你所填写学校的链接。
 如果你的学校排名较后，这个过程会消耗大量内存，CPU资源。
@@ -72,29 +64,50 @@
 		'scheme' => 'https',
 		'host' => 'gipc.campusphere.net'    ];
 	    ToolsKey();
-	    //执行签到
-	    getSignTasks(User(), SignAPIS());
-	    $_POST = [];//清空超全局变量
+	    $res = getSignTasks(User(), SignAPIS());//执行签到任务
+    	    if(isset($res['msg'])){
+	    	$title = '当前没有签到任务。';
+	    	if(!($res['msg']=='login success!' || $res['msg']=='SUCCESS')) $title = '模拟登录API超时或云端被禁用，错误代码：' . $cookie['msg'];
+	    }else{
+        	$title = '答卷提交成功!';
+        	if($res['message'] != 'SUCCESS') $title = '答卷提交失败，原因是：'.$res['message'];
+	    }
+	    SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg');   //Qmsg酱推送
+	    $_POST = [];//清空session
 	    echo '<br>执行完毕!';
 	}
 若你的今日校园任务是信息收集，
 可替换为[必须确保个人信息没有填写错误]
 
 	function main_handler(){
-	   $_POST['school'] = [   
+	    $_POST['school'] = [   
 		'idsUrl' => 'https://gipc.campusphere.net/iap',
 		'scheme' => 'https',
 		'host' => 'gipc.campusphere.net'    ];
 	    ToolsKey();
-	    //执行信息收集
-	    getCollectTasks(User(), CollectAPIS());
-	    $_POST = [];//清空超全局变量
+	    $res = getCollectTasks(User(), CollectAPIS());//执行信息收集
+    	    if(isset($res['msg'])){
+	    	$title = '当前没有签到任务。';
+	    	if(!($res['msg']=='login success!' || $res['msg']=='SUCCESS')) $title = '模拟登录API超时或云端被禁用，错误代码：' . $cookie['msg'];
+	    }else{
+        	$title = '答卷提交成功!';
+        	if($res['message'] != 'SUCCESS') $title = '答卷提交失败，原因是：'.$res['message'];
+	    }
+	    SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg');   //Qmsg酱推送
+	    $_POST = [];//清空session
 	    echo '<br>执行完毕!';
 	}
+
 注意URL`必须`使用英语单引号''填写，`不能`使用`英语双引号""`，
 中文双引号“”，中文单引号‘’，`不能`有多余`空格`，注意末尾逗号！！！
 
-至此，以后每次执行不再从庞大的list列表中搜索你所在学校的名字，节约大量资源。
+6,若要更改推送方式[只支持ServerChan/Qmsg]，默认使用Qmsg，更改推送方式如下。  
+将`index.php`中的
+	
+	SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg');   //Qmsg酱推送
+替换为
+
+	SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan');   //Server酱推送
 
 
 ### 签到答卷填写
@@ -168,12 +181,12 @@
 		    '2077-01-01/12:00',
 		    ['公交'],
 		    ['早餐', '午餐', '晚餐'],
-		    "../images/CSGO.png",
+		    'savefile/sample.png',
 		    ['否']   ],
 		    
 填写格式注意：
-签到暂不支持上传图片，~~因为我懒~~，信息收集的图片上传理论上可行，但需要另行创建与本项目处于同一目录下
-的文件夹存放图片，文件夹默认名称`images`。
+签到、信息收集的图片上传理论上可行，但需要另行创建与本项目处于同一目录下
+的文件夹存放图片，文件夹默认名称savefile。`请注意：`云函数一般不支持读取/写入，因此要使用上传图片功能请使用服务器或本地执行！
 答卷所有符号都必须使用英文符号，答案数组除文本外不能有多余空格除最后一
 项外每一项末尾都要添加英文逗号，且顺序与收集的问题必须完全一致。
 
@@ -212,15 +225,14 @@
 	client_id ：百度OCR API KEY	以及	client_secret ：百度OCR Secret KEY
 
 3，替换代码
-若为签到任务，找到`SignTask.php`中第11，12行
-若为信息收集，找到`CollectMessage.php`同样位置：
+找到`SignTask.php`、`CollectMessage.php`中的
 
-	$cookie = SendRequest($apis['login-api'], [], $params);//从子墨服务器获取cookie
-	//$cookie = StartLogin();//从本地获取cookie
+    	$cookie = GetCookie($user, [$apis['login-api'], $params]);//从子墨服务器获取cookie
+    	//$cookie = GetCookie($user);//从本地获取cookie
 将其更改为
 
-	//$cookie = SendRequest($apis['login-api'], [], $params);//从子墨服务器获取cookie
-	$cookie = StartLogin();//从本地获取cookie
+    	//$cookie = GetCookie($user, [$apis['login-api'], $params]);//从子墨服务器获取cookie
+    	$cookie = GetCookie($user);//从本地获取cookie
 
 ## 简单反防作弊方法及错误排查  
 
@@ -232,17 +244,17 @@
 在`SignTask.php`[签到]/`CollectMessage.php`[信息收集]的执行路径上，最好是第一个方法的第一行添加，如想延时5-30秒可以这样填写：
 
 	function getSignTasks / getCollectTasks (...){
-		SleepTime(5, 30);//随机延时5-30秒
+		Timer(5, 30);//随机延时5-30秒
 		...
 	}
 ### 注意事项
 由于启用随机延时，请注意你的云函数执行时间上限，并且如腾讯云，阿里云的云函数会对执行时长作为计费标准之一，请留意最坏执行时长及使用频率。
 若为本地执行或服务器执行，则要留意`index.php`上方
 
-	set_time_limit(100);//设置执行时间上限(100秒)
-若需紧急执行，请先在所有调用的`SleepTime(..);`前方更改为
+	set_time_limit(150);//设置执行时间上限(150秒)
+若需紧急执行，请先在所有调用的`Timer(..);`前方更改为
 
-	//SleepTime(...);
+	//Timer(...);
 
 ### 今日校园反脚本案例介绍
 由于今日校园为了防止脚本自带提交任务，大概每隔2-4星期会更改一次链接  
