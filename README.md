@@ -73,31 +73,17 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
         	if($res['message'] != 'SUCCESS') $title = '答卷提交失败，原因是：'.$res['message'];
 	    }
 	    SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg');   //Qmsg酱推送
-	    $_POST = [];//清空session
+	    $_POST = [];//超全局变量
 	    echo '<br>执行完毕!';
 	}
 若你的今日校园任务是信息收集，
-可替换为[必须确保个人信息没有填写错误]
+可将上方的
 
-	function main_handler(){
-	    $_POST['school'] = [   
-		'idsUrl' => 'https://gipc.campusphere.net/iap',
-		'scheme' => 'https',
-		'host' => 'gipc.campusphere.net'    ];
-	    ToolsKey();
-	    $res = getCollectTasks(User(), CollectAPIS());//执行信息收集
-    	    if(isset($res['msg'])){
-	    	$title = '当前没有签到任务。';
-	    	if(!($res['msg']=='login success!' || $res['msg']=='SUCCESS')) $title = '模拟登录API超时或云端被禁用，错误代码：' . $cookie['msg'];
-	    }else{
-        	$title = '答卷提交成功!';
-        	if($res['message'] != 'SUCCESS') $title = '答卷提交失败，原因是：'.$res['message'];
-	    }
-	    SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg');   //Qmsg酱推送
-	    $_POST = [];//清空session
-	    echo '<br>执行完毕!';
-	}
+	$res = getSignTasks(User(), SignAPIS());//执行签到任务
+更改为
 
+	$res = getCollectTasks(User(), CollectAPIS());//执行信息收集
+	
 注意URL`必须`使用英语单引号''填写，`不能`使用`英语双引号""`，
 中文双引号“”，中文单引号‘’，`不能`有多余`空格`，注意末尾逗号！！！
 
