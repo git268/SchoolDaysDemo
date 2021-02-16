@@ -282,6 +282,12 @@ Timer亦提供精确定时功能，使用得当可以准时签到，指~~0秒签
 或
     	
 	$cookie = GetCookie($user, [], 1);//从本地获取cookie
+且将`SignTask.php`签到任务/`CollectMessage.php`信息收集中找到
+
+	//if(empty($data))$cookie = GetCookie($user, [$apis['login-api'], $params], 1);//强制更新cookie
+去掉前面的`//`，更改为：
+
+	if(empty($data))$cookie = GetCookie($user, [$apis['login-api'], $params], 1);//强制更新cookie
 这样会在第一次运行后在savefile里生成一个当前账号命名的txt文件用于保存cookie，此后登陆时就从已保存的
 txt文件中提取cookie，能将运行脚本速度缩短到0.8秒内。
 #### 注意：
