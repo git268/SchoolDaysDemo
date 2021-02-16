@@ -272,13 +272,15 @@ Timer亦提供精确定时功能，使用得当可以准时签到，指~~0秒签
 
     	$cookie = GetCookie($user, [$apis['login-api'], $params]);//从子墨服务器获取cookie
 或
-    	$cookie = GetCookie($user, []);//从本地获取cookie
+    	
+	$cookie = GetCookie($user, []);//从本地获取cookie
 具体看你使用何种方式获取cookie，前面没有`//`的就是你使用的方式。  
 将其在末尾添加一个参数如：
 
     	$cookie = GetCookie($user, [$apis['login-api'], $params], 1);//从子墨服务器获取cookie
 或
-    	$cookie = GetCookie($user, [], 1);//从本地获取cookie
+    	
+	$cookie = GetCookie($user, [], 1);//从本地获取cookie
 这样会在第一次运行后在savefile里生成一个当前账号命名的txt文件用于保存cookie，此后登陆时就从已保存的
 txt文件中提取cookie，能将运行脚本速度缩短到0.8秒内。
 #### 注意：
