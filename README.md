@@ -214,26 +214,26 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 找到`SignTask.php`、`CollectMessage.php`中的
 
     	$cookie = GetCookie($user, [$apis['login-api'], $params]);//从子墨服务器获取cookie
-    	//$cookie = GetCookie($user);//从本地获取cookie
+    	//$cookie = GetCookie($user, []);//从本地获取cookie
 将其更改为
 
     	//$cookie = GetCookie($user, [$apis['login-api'], $params]);//从子墨服务器获取cookie
-    	$cookie = GetCookie($user);//从本地获取cookie
+    	$cookie = GetCookie($user, []);//从本地获取cookie
 
-## 简单反防作弊方法及错误排查  
+## 附加特殊功能及错误排查  
 
 ### 反防作弊方法简介
 根据观察连续几天的签到排行榜单发现，每天前十几乎都是老面孔，而且是每天准时`[精确到秒]`的签到时间。这种定时签到方式再辅导员眼里实际非常明显。
-为此我在`ToolsHelper.php`中加入SleepTime方法提供随机延时以降低呗辅导员发现的可能~~只能在时间显示上没这么明显，后台是否能检测脚本未知~~。
-其中SleepTime($min, $max)有两个通俗易懂的参数：最小延迟时间，最大延迟时间。
-### 使用方法
+为此我在`ToolsHelper.php`中加入Timer方法提供随机延时以降低呗辅导员发现的可能~~只能在时间显示上没这么明显，后台是否能检测脚本未知~~。
+其中Timer([$min, $max])有两个通俗易懂的参数：最小延迟时间，最大延迟时间。
+#### 使用方法
 在`SignTask.php`[签到]/`CollectMessage.php`[信息收集]的执行路径上，最好是第一个方法的第一行添加，如想延时5-30秒可以这样填写：
 
 	function getSignTasks / getCollectTasks (...){
-		Timer(5, 30);//随机延时5-30秒
+		Timer([5, 30]);//随机延时5-30秒
 		...
 	}
-### 注意事项
+#### 注意事项
 由于启用随机延时，请注意你的云函数执行时间上限，并且如腾讯云，阿里云的云函数会对执行时长作为计费标准之一，请留意最坏执行时长及使用频率。
 若为本地执行或服务器执行，则要留意`index.php`上方
 
@@ -241,6 +241,71 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 若需紧急执行，请先在所有调用的`Timer(..);`前方更改为
 
 	//Timer(...);
+
+### 定时器使用方法
+Timer亦提供精确定时功能，使用得当可以准时签到，指~~0秒签到进入封号斗罗排行榜~~。
+要想成为封号斗罗，首先要提前20秒左右触发启动脚本定时任务，不能少于5秒防止cookie获取失败，
+也不能超过2分钟，因为定时上限只有2分钟，且不能使用随机延时。  
+如任务在每天早上07:00:00发布。可在`SubmitForm.php`中的
+
+	echo"<br>答卷结果<br>";
+的下一行添加如下代码：
+
+	Timer('07:00:00');//准时7点提交任务，精确到50毫秒
+且在`SignTask.php`签到任务/`CollectMessage.php`信息收集中找到
+
+	echo"<br>第二次请求获取xx任务<br>";
+	$datas = ...;//获取任务
+	//print_r($datas);
+	if(...){
+		...
+	}
+将其中的
+
+	if(...)
+改成
+
+	if(true)
+### 优化运行速度
+在自动签到/信息收集过程中，耗时最长的是获取cookie的过程，大概2-4秒不等。
+因此想要加速脚本运行，减少资源占用，可在`SignTask.php`签到任务/`CollectMessage.php`信息收集中找到
+
+    	$cookie = GetCookie($user, [$apis['login-api'], $params]);//从子墨服务器获取cookie
+或
+    	$cookie = GetCookie($user, []);//从本地获取cookie
+具体看你使用何种方式获取cookie，前面没有`//`的就是你使用的方式。  
+将其在末尾添加一个参数如：
+
+    	$cookie = GetCookie($user, [$apis['login-api'], $params], 1);//从子墨服务器获取cookie
+或
+    	$cookie = GetCookie($user, [], 1);//从本地获取cookie
+这样会在第一次运行后在savefile里生成一个当前账号命名的txt文件用于保存cookie，此后登陆时就从已保存的
+txt文件中提取cookie，能将运行脚本速度缩短到0.8秒内。
+#### 注意：
+使用本地保存cookie功能与上传图片类似，需要支持读取/写入的环境，一般云函数不支持该功能，请在本地或服务器使用。
+
+### 随机定位
+上述定时器功能能助你进入封号斗罗排行榜，下面的随机定位功能能让你环游世界，指定位层面。
+该功能会随机生成一个北半球经纬度，有一定风险，你的辅导员可能很快就到你家门口，请勿滥用。
+#### 使用方法
+在`Config.php`的User()中：
+
+	//$coordinate = RandomCoordinate();
+    	$user = [   'username'=> '账号', 'password'=>'密码', 'address'=>'地址',
+	'email'=> 'None', 'school'=> '', 'lon'=> '经度', 'lat'=> '纬度',
+	'abnormalReason'=> '在学校', 'photoaddress'=> 'savefile/sample.png'];
+	return $user;
+更改为:
+
+	$coordinate = RandomCoordinate();//获取随机定位
+    	$user = [   'username'=> '账号', 'password'=>'密码', 'address'=>'地址',
+	'email'=> 'None', 'school'=> '', 'lon'=> '经度', 'lat'=> '纬度',
+	'abnormalReason'=> '在学校', 'photoaddress'=> 'savefile/sample.png'];
+	$user['lon'] =  $coordinate['lon'];//填充随机经度
+	$user['lat'] =  $coordinate['lat'];//填充随机纬度
+	return $user;
+#### 注意
+使用后请注意人生安全。
 
 ### 今日校园反脚本案例介绍
 由于今日校园为了防止脚本自带提交任务，大概每隔2-4星期会更改一次链接  
@@ -265,12 +330,8 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 模拟登录API问题请阅读API服务器篇
 
 ### 简单自行排查
-若你已提交任务且任务时间未结束，会产生以下的错误  
-若此时执行签到任务，日志/微信推送会显示报错：	自动签到失败，原因是：请求参数SignInstanceWid为空  
-若此时执行信息收集，日志/微信推送会显示报错：	自动填写信息收失败，原因是：该收集已填写无需再次填写  
-上述报错是正常情况，请勿在一个任务时间段内多次执行  
 
-若有其他报错，签到任务请打开`SignTask.php`，信息收集任务打开`CollectMessage.php`
+遇到报错难以解决，可在签到任务请打开`SignTask.php`，信息收集任务打开`CollectMessage.php`
 找出全部的	
 
 	print_r(xxx);
