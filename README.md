@@ -308,10 +308,8 @@ txt文件中提取cookie，能将运行脚本速度缩短到0.8秒内。
 
 	$coordinate = RandomCoordinate();//获取随机定位
     	$user = [   'username'=> '账号', 'password'=>'密码', 'address'=>'地址',
-	'email'=> 'None', 'school'=> '', 'lon'=> '经度', 'lat'=> '纬度',
+	'email'=> 'None', 'school'=> '', 'lon'=> $coordinate['lon'], 'lat'=> $coordinate['lat'],
 	'abnormalReason'=> '在学校', 'photoaddress'=> 'savefile/sample.png'];
-	$user['lon'] =  $coordinate['lon'];//填充随机经度
-	$user['lat'] =  $coordinate['lat'];//填充随机纬度
 	return $user;
 #### 注意
 使用后请注意人生安全。
