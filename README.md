@@ -8,22 +8,7 @@
 
 ## 部署方法：
 
-### 1,填写`Config.php`中User()的信息：
-账号	密码	经/纬度[精确到小数点后5位]	学校全称	定位状态    图片路径  
-其中图片路径为签到提交的图片，若不需要提交可以不填，信息收集提交的图片填写在答卷中。
-
-### 2,填写`Config.php`中ToolsKey()其他工具信息：
-
-#### 脚本运行结果推送：  
-'ServerChanKey' ： Server酱油key  
-'QmsgKey'：     Qmsg酱key  
-两者皆用于消息推送，使用哪个填哪个，默认使用Qmsg酱
-
-#### 百度OCR识别key
-BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可直接无视。
-使用脚本获取cookie有局限性，详情见API服务器篇
-
-### 4，执行环境：PHP7。
+### 1，执行环境：PHP7。
 若在非云函数下执行，请将index.php中最后一行
 
 	//main_handler();
@@ -42,7 +27,25 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 	}
 若部署环境为腾讯云云函数，不需要修改主函数。
 
-### 5，学校URL填写：
+### 2,填写`Config.php`中User()的信息：
+账号	密码	经/纬度[精确到小数点后5位]	学校全称	定位状态    图片路径  
+其中图片路径为签到提交的图片，若不需要提交可以不填，信息收集提交的图片填写在答卷中。
+
+### 3,填写`Config.php`中ToolsKey()其他工具信息：
+
+##### 脚本运行结果推送：  
+'ServerChanKey' ： Server酱油key  
+'QmsgKey'：     Qmsg酱key  
+'TGKey'：	telegram bot两个参数[token与聊天id]  
+两者皆用于消息推送，使用哪个填哪个，默认使用Qmsg酱
+
+#### 百度OCR识别key
+BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可直接无视。
+使用脚本获取cookie有局限性，详情见API服务器篇
+
+
+
+### 4，学校URL填写：
 因为在每次登录时适配不同学校的中查找list获得学校的host需要遍历全国各个
 学校直到找到你的学校为止。如果只设置了用户信息，默认只查找并显示你所填写学校的链接。
 如果你的学校排名较后，这个过程会消耗大量内存，CPU资源。
@@ -73,7 +76,7 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
         	$title = '答卷提交成功!';
         	if($res['message'] != 'SUCCESS') $title = '答卷提交失败，原因是：'.$res['message'];
 	    }
-	    SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg');   //Qmsg酱推送
+	    print_r(SendNotice([$title, date('Y-m-d H:i:s')], 1));   //Qmsg酱推送
 	    $_POST = [];//超全局变量
 	    echo '<br>执行完毕!';
 	}
@@ -88,43 +91,53 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 注意URL`必须`使用英语单引号''填写，`不能`使用`英语双引号""`，
 中文双引号“”，中文单引号‘’，`不能`有多余`空格`，注意末尾逗号！！！
 
-6,若要更改推送方式[只支持ServerChan/Qmsg]，默认使用Qmsg，更改推送方式如下。  
+6,若要更改推送方式[只支持ServerChan/Qmsg]，默认使用Qmsg，其他推送方式如下。  
 将`index.php`中的
 	
-	SendNotice($title, date('Y-m-d H:i:s'), 'Qmsg');   //Qmsg酱推送
-替换为
+	print_r(SendNotice([$title, date('Y-m-d H:i:s')], 1));   //Qmsg酱推送
+替换为Server酱推送
 
-	SendNotice($title, date('Y-m-d H:i:s'), 'ServerChan');   //Server酱推送
+	print_r(SendNotice([$title, date('Y-m-d H:i:s')], 2));   //Server酱推送
+或telegram bot 推送
+	
+	print_r(SendNotice([$title, date('Y-m-d H:i:s')], 3));   //TG bot推送
+若使用telegram bot推送，请使用海外服务器或自备梯子，海外IP仍能正常所有功能。  
+其中使用代理需在`ToolsHelper.php`中的SendRequest(...)方法找到：
 
+	//curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:端口号');//TG bot需要使用代理，请自备梯子
+替换为：
 
+	curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:端口号');//TG bot需要使用代理，请自备梯子  
+	
+## 答案填写
 ### 签到答卷填写
 
 请先完成配置填写中的步骤
 
-适用于签到，下列为默认问题，用于展示样本，图片请在`Config.php`的User()中填写图片路径，可适当增删改。
-签到答卷在`SubmitForm.php`文件的SignForm()中：
+适用于签到，图片请在`Config.php`的User()中填写图片路径。由于签到大部分为纯选择题[包括判断题]，默认使用自动填写正常答案功能。
+若你的签到问卷全为选择题，可以跳过此步骤，下列展示为非选择题情况。
 
 	$form = [
 		...
-		'extraFieldItems'=> [答案]
+		'extraFieldItems'=> [答案],
 		]
 问卷：
 
-	1：今天你的体重是多？  
-	答：10kg以下
+	1：今天你的体重是多？  [纯文本]
+	答：599.88KG
 
-	2：今天周几？  
-	答：周八
+	2：今天周几？  	[选择题]
+	A:周一	B：周二	C：周四	D：周六
+	答：周一
 
-	3：近14天你有无吃早餐？  
+	3：近14天你有无吃早餐？ [判断题]
 	答：否
 
 
 样卷格式：
 
-	 'extraFieldItems'=> [ '10kg以下',
-			       '周八',
-			       '否'],
+	 'extraFieldItems'=> ['599.88KG'],
+即只用填写非选择题答案，请按照先后顺序。
 			 
 ### 信息收集答卷填写
 适用于信息收集，下列问题用于展示不同问题的答案样本，可适当增删改。
