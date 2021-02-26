@@ -9,7 +9,8 @@
 ## 部署方法：
 
 ### 1，执行环境：PHP7。
-若在非云函数下执行，请将index.php中最后一行
+请下载release中最新版的SchoolDaysDemo.zip
+。若在非云函数下执行，请将index.php中最后一行
 
 	//main_handler();
 替换为
@@ -28,8 +29,7 @@
 若部署环境为腾讯云云函数，不需要修改主函数。
 
 ### 2,填写`Config.php`中User()的信息：
-账号	密码	经/纬度[精确到小数点后5位]	学校全称	定位状态    图片路径  
-其中图片路径为签到提交的图片，若不需要提交可以不填，信息收集提交的图片填写在答卷中。
+账号	密码	经/纬度[精确到小数点后5位]	学校全称	定位状态   
 
 ### 3,填写`Config.php`中ToolsKey()其他工具信息：
 
@@ -68,30 +68,23 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 		'scheme' => 'https',
 		'host' => 'gipc.campusphere.net'    ];
 	    ToolsKey();
-	    $res = getSignTasks(User(), SignAPIS());//执行签到任务
-    	    if(isset($res['msg'])){
-	    	$title = '当前没有签到任务。';
-	    	if(!($res['msg']=='login success!' || $res['msg']=='SUCCESS')) $title = '模拟登录API超时或云端被禁用，错误代码：' . $cookie['msg'];
-	    }else{
-        	$title = '答卷提交成功!';
-        	if($res['message'] != 'SUCCESS') $title = '答卷提交失败，原因是：'.$res['message'];
-	    }
-	    print_r(SendNotice([$title, date('Y-m-d H:i:s')], 1));   //Qmsg酱推送
-	    $_POST = [];//超全局变量
+	    getSignTasks(User(), SignAPIS());   //签到
+	    if(empty($_POST['Result']))$_POST['Result'] = '答卷提交成功！';
+	    print_r(SendNotice([$_POST['Result'], date('Y-m-d H:i:s')], 1));   //Qmsg酱推送
 	    echo '<br>执行完毕!';
 	}
 若你的今日校园任务是信息收集，
 可将上方的
 
-	$res = getSignTasks(User(), SignAPIS());//执行签到任务
+	getSignTasks(User(), SignAPIS());   //签到
 更改为
 
-	$res = getCollectTasks(User(), CollectAPIS());//执行信息收集
+	getCollectTasks(User(), CollectAPIS()); //信息收集
 	
 注意URL`必须`使用英语单引号''填写，`不能`使用`英语双引号""`，
 中文双引号“”，中文单引号‘’，`不能`有多余`空格`，注意末尾逗号！！！
 
-6,若要更改推送方式[只支持ServerChan/Qmsg]，默认使用Qmsg，其他推送方式如下。  
+6,若要更改推送方式，默认使用Qmsg，其他推送方式如下。  
 将`index.php`中的
 	
 	print_r(SendNotice([$title, date('Y-m-d H:i:s')], 1));   //Qmsg酱推送
@@ -104,12 +97,33 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 若使用telegram bot推送，请使用海外服务器或自备梯子，海外IP仍能正常所有功能。  
 其中使用代理需在`ToolsHelper.php`中的SendRequest(...)方法找到：
 
-	//curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:端口号');//TG bot需要使用代理，请自备梯子
+	//curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:你的梯子端口号');//TG bot需要使用代理，请自备梯子
 替换为：
 
-	curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:端口号');//TG bot需要使用代理，请自备梯子  
+	curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:xxxx');//TG bot需要使用代理，请自备梯子  
 	
-## 答案填写
+## 答案填写&自动装填机
+### 自动装填机
+由于今日校园请求任务时会返回历史答卷或在答卷选择题中标注正确答案，无非手动填写答卷的自动装填算法应运而生，默认为手动填充，有以下2种模式供选择：  
+`全自动装填模式`：根据历史答卷重新填充，无需填写答卷。因此请确认历史答卷有无填写错误。若问卷有变，使用该模式不会提交答卷并返回第x题填充失败。  
+`手动装填模式`：需要在本脚本手动填写答卷，可灵活根据问卷填充答卷。需注意的是在签到中手动装填也会自动根据正确答案自动填写选择题，[并非根据历史答卷]。
+且签到中绝大多数为纯选择题，因此签到的手动装填即使频繁更改问卷只要不发布文本问题也可以自适应填充答卷。  
+
+#### 选择答卷装填模式
+签到：在`SignTask.php`中找到：
+
+	if($res['isNeedExtra'] == 1)$form['extraFieldItems'] = FillSignForm($res, $form['extraFieldItems']);//手动填充答卷
+若你若需自动装填，则更改为：
+
+	if($res['isNeedExtra'] == 1)$form['extraFieldItems'] = FillSignForm($res, $form['extraFieldItems'], true);//自动填充答卷
+  
+信息收集：在`CollectMessage.php`中找到：
+	
+	$form['form'] = FillCollectForm($res['datas']['rows'], $form['form']);//手动填充答卷
+若你若需自动装填，则更改为：
+
+	$form['form'] = FillCollectForm($res['datas']['rows'], $form['form'], true);//自动填充答卷
+  
 ### 签到答卷填写
 
 请先完成配置填写中的步骤
@@ -130,13 +144,14 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 	A:周一	B：周二	C：周四	D：周六
 	答：周一
 
-	3：近14天你有无吃早餐？ [判断题]
-	答：否
+	3：请上传你小时候的照片？ [图片]
+	答：'savefile/sample.png'
 
 
 样卷格式：
 
-	 'extraFieldItems'=> ['599.88KG'],
+	 'extraFieldItems'=> [	'599.88KG', 
+	 			'savefile/sample.png'	],
 即只用填写非选择题答案，请按照先后顺序。
 			 
 ### 信息收集答卷填写
@@ -173,7 +188,7 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 	是	否  
 	答：['否']
 
-样卷格式：
+答卷格式：
 
 	 'form'=> [
 		    'xx省/xx市/xx区',
@@ -312,17 +327,21 @@ txt文件中提取cookie，能将运行脚本速度缩短到0.8秒内。
 #### 使用方法
 在`Config.php`的User()中：
 
-	//$coordinate = RandomCoordinate();
-    	$user = [   'username'=> '账号', 'password'=>'密码', 'address'=>'地址',
-	'email'=> 'None', 'school'=> '', 'lon'=> '经度', 'lat'=> '纬度',
-	'abnormalReason'=> '在学校', 'photoaddress'=> 'savefile/sample.png'];
+	$user = [   'username'=> '账号', 'password'=>'密码', 'address'=>'地址','email'=> 'None',
+        'school'=> '', 'lon'=> '经度', 'lat'=> '纬度', 'abnormalReason'=> '在学校' ];
+	/*
+	$coordinate = RandomCoordinate();//获取随机坐标
+	$user['lon'] = $coordinate['lon'];
+	$user['lat'] = $coordinate['lat'];
+	*/
 	return $user;
 更改为:
 
-	$coordinate = RandomCoordinate();//获取随机定位
-    	$user = [   'username'=> '账号', 'password'=>'密码', 'address'=>'地址',
-	'email'=> 'None', 'school'=> '', 'lon'=> $coordinate['lon'], 'lat'=> $coordinate['lat'],
-	'abnormalReason'=> '在学校', 'photoaddress'=> 'savefile/sample.png'];
+	$user = [   'username'=> '账号', 'password'=>'密码', 'address'=>'地址','email'=> 'None',
+        'school'=> '', 'lon'=> '经度', 'lat'=> '纬度', 'abnormalReason'=> '在学校' ];
+	$coordinate = RandomCoordinate();//获取随机坐标
+	$user['lon'] = $coordinate['lon'];
+	$user['lat'] = $coordinate['lat'];
 	return $user;
 #### 注意
 使用后请注意人生安全。
