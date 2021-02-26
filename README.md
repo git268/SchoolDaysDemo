@@ -94,7 +94,7 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 或telegram bot 推送
 	
 	print_r(SendNotice([$title, date('Y-m-d H:i:s')], 3));   //TG bot推送
-若使用telegram bot推送，请使用海外服务器或自备梯子，海外IP仍能正常所有功能。  
+若使用telegram bot推送，请使用海外服务器或自备梯子，海外IP能正常完成所有功能。  
 其中使用代理需在`ToolsHelper.php`中的SendRequest(...)方法找到：
 
 	//curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:你的梯子端口号');//TG bot需要使用代理，请自备梯子
@@ -273,28 +273,24 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 
 ### 定时器使用方法
 Timer亦提供精确定时功能，使用得当可以准时签到，指~~0秒签到进入封号斗罗排行榜~~。
-要想成为封号斗罗，首先要提前20秒左右触发启动脚本定时任务，不能少于5秒防止cookie获取失败，
+要想成为封号斗罗，首先需要在任务发布前20秒左右触发启动脚本定时任务，不能少于5秒防止cookie获取失败，
 也不能超过2分钟，因为定时上限只有2分钟，且不能使用随机延时。  
-如任务在每天早上07:00:00发布。可在`SubmitForm.php`中的
-
-	echo"<br>答卷结果<br>";
-的下一行添加如下代码：
-
-	Timer('07:00:00');//准时7点提交任务，精确到50毫秒
-且在`SignTask.php`签到任务/`CollectMessage.php`信息收集中找到
+如任务在每天早上07:00:00发布。可在`SignTask.php`签到任务/`CollectMessage.php`信息收集中找到
 
 	echo"<br>第二次请求获取xx任务<br>";
 	$datas = ...;//获取任务
-	//print_r($datas);
 	if(...){
 		...
 	}
-将其中的
-
-	if(...)
 改成
 
-	if(true)
+	echo"<br>第二次请求获取xx任务<br>";
+	$datas = ...;//获取任务
+	Timer('07:00:00');//准时7点提交任务，精确到50毫秒
+	if(...){
+		...
+	}
+	
 ### 优化运行速度
 在自动签到/信息收集过程中，耗时最长的是获取cookie的过程，大概2-4秒不等。
 因此想要加速脚本运行，减少资源占用，可在`SignTask.php`签到任务/`CollectMessage.php`信息收集中找到
