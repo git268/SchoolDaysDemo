@@ -128,7 +128,7 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 
 请先完成配置填写中的步骤
 
-适用于签到，图片请在`Config.php`的User()中填写图片路径。由于签到大部分为纯选择题[包括判断题]，默认使用自动填写正常答案功能。
+适用于签到，由于签到大部分为纯选择题[包括判断题]，即使手动装填也会自动填写正确答案。
 若你的签到问卷全为选择题，可以跳过此步骤，下列展示为非选择题情况。
 
 	$form = [
@@ -145,13 +145,13 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 	答：周一
 
 	3：请上传你小时候的照片？ [图片]
-	答：'savefile/sample.png'
+	答：file_get_contents('savefile/sample.png')
 
 
 样卷格式：
 
 	 'extraFieldItems'=> [	'599.88KG', 
-	 			'savefile/sample.png'	],
+	 			file_get_contents('savefile/sample.png')	],
 即只用填写非选择题答案，请按照先后顺序。
 			 
 ### 信息收集答卷填写
@@ -182,7 +182,7 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 	答：['早餐', '午餐', '晚餐']
 
 	6：请上传打卡照片		[图片]  
-	答：'savefile/sample.png',  
+	答：file_get_contents('savefile/sample.png')
 
 	7：有无咳嗽，发烧等身体不适？	[判断题]  
 	是	否  
@@ -196,7 +196,7 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 		    '2077-01-01/12:00',
 		    ['公交'],
 		    ['早餐', '午餐', '晚餐'],
-		    'savefile/sample.png',
+		    file_get_contents('savefile/sample.png'),
 		    ['否']   ],
 		    
 填写格式注意：
