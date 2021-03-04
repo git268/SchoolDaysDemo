@@ -144,7 +144,8 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 	A:周一	B：周二	C：周四	D：周六
 	答：周一
 
-	3：请上传你小时候的照片？ [图片]
+	3：你今天是否喝水？ [判断题]
+	
 	答：file_get_contents('savefile/sample.png')
 
 
