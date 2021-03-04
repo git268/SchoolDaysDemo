@@ -28,7 +28,7 @@
 	}
 若部署环境为腾讯云云函数，不需要修改主函数。
 
-### 2,填写`Config.php`中User()的信息：
+### 2,填写`Config.php`中User()的信息：  
 账号	密码	经/纬度[精确到小数点后5位]	学校全称	定位状态   
 
 ### 3,填写`Config.php`中ToolsKey()其他工具信息：
@@ -132,6 +132,7 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 若你的签到问卷全为选择题，可以跳过此步骤，下列展示为非选择题情况。
 
 	$form = [
+		'signPhotoUrl'=> '',
 		...
 		'extraFieldItems'=> [答案],
 		]
@@ -145,14 +146,19 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 	答：周一
 
 	3：你今天是否喝水？ [判断题]
+	 是	 否
+	答：是
+若要上传图片，请将
 	
-	答：file_get_contents('savefile/sample.png')
+	'signPhotoUrl'=> '',
+改成
+
+	'signPhotoUrl'=> file_get_contents('图片路径'),//图片路径如savefile/sample.png
 
 
 样卷格式：
 
-	 'extraFieldItems'=> [	'599.88KG', 
-	 			file_get_contents('savefile/sample.png')	],
+	 'extraFieldItems'=> '599.88KG'],  
 即只用填写非选择题答案，请按照先后顺序。
 			 
 ### 信息收集答卷填写
@@ -183,7 +189,7 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 	答：['早餐', '午餐', '晚餐']
 
 	6：请上传打卡照片		[图片]  
-	答：file_get_contents('savefile/sample.png')
+	答：file_get_contents('图片路径')
 
 	7：有无咳嗽，发烧等身体不适？	[判断题]  
 	是	否  
