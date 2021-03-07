@@ -296,32 +296,6 @@ Timer亦提供精确定时功能，使用得当可以准时签到，指~~0秒签
 		...
 	}
 	
-### 优化运行速度
-在自动签到/信息收集过程中，耗时最长的是获取cookie的过程，大概2-4秒不等。
-因此想要加速脚本运行，减少资源占用，可在`SignTask.php`签到任务/`CollectMessage.php`信息收集中找到
-
-    	$cookie = GetCookie($params, $apis['login-api']);//从子墨服务器获取cookie
-或
-    	
-	$cookie = GetCookie($params, '');//从本地获取cookie
-具体看你使用何种方式获取cookie，前面没有`//`的就是你使用的方式。  
-将其在末尾添加一个参数如：
-
-    	$cookie = GetCookie($params, $apis['login-api'], 1);//从子墨服务器获取cookie
-或
-    	
-	$cookie = GetCookie($params, '', 1);//从本地获取cookie
-且将`SignTask.php`签到任务/`CollectMessage.php`信息收集中找到
-
-	//GetCookie($params, $apis['login-api'], 1);//强制更新cookie，请勿在云函数使用！
-去掉前面的`//`，更改为：
-
-	GetCookie($params, $apis['login-api'], 1);//强制更新cookie，请勿在云函数使用！
-这样会在第一次运行后在savefile里生成一个当前账号命名的txt文件用于保存cookie，此后登陆时就从已保存的
-txt文件中提取cookie，能将运行脚本速度缩短到0.8秒内。  
-
-#### 注意：
-使用本地保存cookie功能与上传图片类似，需要支持读取/写入的环境，一般云函数不支持该功能，请在本地或服务器使用。
 
 ### 随机定位
 上述定时器功能能助你进入封号斗罗排行榜，下面的随机定位功能能让你环游世界，指定位层面。
