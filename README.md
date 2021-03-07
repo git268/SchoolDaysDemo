@@ -135,6 +135,7 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 		'signPhotoUrl'=> '',
 		...
 		'extraFieldItems'=> [答案],
+		...
 		]
 问卷：
 
@@ -167,7 +168,8 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 
 	$data = [
 		...
-		'form'=> [答案]
+		'form'=> [答案],
+		...
 		]
 问卷：
 
