@@ -154,12 +154,16 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 	'signPhotoUrl'=> '',
 改成
 
-	'signPhotoUrl'=> file_get_contents('图片路径'),//图片路径如savefile/sample.png
+	'signPhotoUrl'=> '图片路径',//图片路径如savefile/sample.png
+该功能需要执行环境有读取权限，云函数一般不支持该功能。若你没有图床也没有适合的执行环境，且辅导员不看提交内容，
+可填写今日校园的官网logo图片路径：
+	
+	'signPhotoUrl'=> 'https://www.campushoy.com/wp-content/uploads/2019/06/cropped-hoy.png',//图片路径如savefile/sample.png
 
 
 样卷格式：
 
-	 'extraFieldItems'=> '599.88KG'],  
+	 'extraFieldItems'=> ['599.88KG'],  
 即只用填写非选择题答案，请按照先后顺序。
 			 
 ### 信息收集答卷填写
@@ -190,12 +194,10 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 	A: 早餐	B: 午餐	C: 晚餐  
 	答：['早餐', '午餐', '晚餐']
 
-	6：请上传打卡照片		[图片]  
-	答：file_get_contents('图片路径')
-
-	7：有无咳嗽，发烧等身体不适？	[判断题]  
+	6：有无咳嗽，发烧等身体不适？	[判断题]  
 	是	否  
 	答：['否']
+
 
 答卷格式：
 
@@ -205,7 +207,6 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 		    '2077-01-01/12:00',
 		    ['公交'],
 		    ['早餐', '午餐', '晚餐'],
-		    file_get_contents('savefile/sample.png'),
 		    ['否']   ],
 		    
 填写格式注意：
