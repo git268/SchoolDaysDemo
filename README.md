@@ -71,7 +71,7 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 	    getSignTasks(User(), SignAPIS());   //签到
 	    if(empty($_POST['Result']))$_POST['Result'] = '答卷提交成功！';
 	    print_r(SendNotice([$_POST['Result'], date('Y-m-d H:i:s')], 1));   //Qmsg酱推送
-	    echo '<br>执行完毕!';
+	    echo '填写状态：'.$_POST['Result'];
 	}
 若你的今日校园任务是信息收集，
 可将上方的
