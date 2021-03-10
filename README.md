@@ -33,17 +33,21 @@
 
 ### 3,填写`Config.php`中ToolsKey()其他工具信息：
 
-##### 脚本运行结果推送：  
+##### 脚本支持的推送方式：  
 'ServerChanKey' ： Server酱油key  
 'QmsgKey'：     Qmsg酱key  
 'TGKey'：	telegram bot两个参数[token与聊天id]  
-两者皆用于消息推送，使用哪个填哪个，默认使用Qmsg酱
-
-#### 百度OCR识别key
-BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可直接无视。
-使用脚本获取cookie有局限性，详情见API服务器篇
+皆用于消息推送，使用哪个填哪个，key在`Config.php`的User中的notice。
 
 
+	'notice'=> ['type'=>1, 'key'=> '推送方式的key']//qmsg酱
+或
+
+	'notice'=> ['type'=>2, 'key'=> '推送方式的key']//server酱
+或
+
+	'notice'=> ['type'=>1, 'key'=> ['token', 'chant_id']]//telegram bot
+	
 
 ### 4，学校URL填写：
 因为在每次登录时适配不同学校的中查找list获得学校的host需要遍历全国各个
@@ -56,44 +60,38 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 
 控制台会输出
 
-	Array ( [idsUrl] => https://gipc.campusphere.net/iap [scheme] => https [host] => gipc.campusphere.net )
+	Array ( [idsUrl] => https://gipc.campusphere.net/iap  [host] => gipc.campusphere.net )
 
 找到`index.php`主函数function main_handler()
 若你的今日校园任务是签到，
 可替换为[必须确保个人信息没有填写错误]
 
 	function main_handler(){
+	    $serviceapi = 'http://www.zimo.wiki:8080/wisedu-unified-login-api-v1.0/api/login';//外置API
 	    $_POST['school'] = [   
 		'idsUrl' => 'https://gipc.campusphere.net/iap',
-		'scheme' => 'https',
 		'host' => 'gipc.campusphere.net'    ];
-	    ToolsKey();
-	    getSignTasks(User(), SignAPIS());   //签到
+	    $user = User();
+	    Getcookie($user['username'], $user['password'], $serviceapi);//外置API模拟登陆获取cookie 
+	    getSignTasks($user, SignAPIS());   //签到
 	    if(empty($_POST['Result']))$_POST['Result'] = '答卷提交成功！';
-	    print_r(SendNotice([$_POST['Result'], date('Y-m-d H:i:s')], 1));   //Qmsg酱推送
+	    print_r(SendNotice([$_POST['Result'], date('Y-m-d H:i:s')], $user['notice']['key'], $user['notice']['type']));   //Qmsg酱推送
 	    echo '填写状态：'.$_POST['Result'];
 	}
 若你的今日校园任务是信息收集，
 可将上方的
 
-	getSignTasks(User(), SignAPIS());   //签到
+	getSignTasks($user, SignAPIS());   //签到
 更改为
 
-	getCollectTasks(User(), CollectAPIS()); //信息收集
+	getCollectTasks($user, CollectAPIS()); //信息收集
+若是辅导员通知，更改为
+	
+	getQueryTasks($user, ConfirmAPIS());//辅导员通知
 	
 注意URL`必须`使用英语单引号''填写，`不能`使用`英语双引号""`，
 中文双引号“”，中文单引号‘’，`不能`有多余`空格`，注意末尾逗号！！！
 
-6,若要更改推送方式，默认使用Qmsg，其他推送方式如下。  
-将`index.php`中的
-	
-	print_r(SendNotice([$title, date('Y-m-d H:i:s')], 1));   //Qmsg酱推送
-替换为Server酱推送
-
-	print_r(SendNotice([$title, date('Y-m-d H:i:s')], 2));   //Server酱推送
-或telegram bot 推送
-	
-	print_r(SendNotice([$title, date('Y-m-d H:i:s')], 3));   //TG bot推送
 若使用telegram bot推送，请使用海外服务器或自备梯子，海外IP能正常完成所有功能。  
 其中使用代理需在`ToolsHelper.php`中的SendRequest(...)方法找到：
 
@@ -223,39 +221,33 @@ BaiDuOCRKey是为不使用子墨API服务器准备的，若使用子墨的API可
 解决办法有如下2种：
 
 ### 使用自行架设的服务器，
-即将`Config.php`中SignAPIS、CollectAPIS的
+即将`index.php`中
 
-	'login-api'=>'http://你的服务器IP地址:端口号/wisedu-unified-login-api-v1.0/api/login'  
+	$serviceapi ='http://你的服务器IP地址:端口号/wisedu-unified-login-api-v1.0/api/login';
 [架设方法](https://github.com/ZimoLoveShuang/wisedu-unified-login-api)
 
 ### 使用本脚本自带的`SimulationLogin.php`
 本PHP文件子墨API的部分功能整合在一起，但并未适配全部学校。
 先说局限性，在配置填写中，我们在填写学校URL步骤时控制台会输出如下
 
-	Array ( [idsUrl] => https://gipc.campusphere.net/iap [scheme] => https [host] => gipc.campusphere.net )
-其中因工程量浩大，只适配了[idsUrl]的后缀为/iap的学校，因此如果你的学校不是这种结尾，请使用第一种办法
+	Array ( [idsUrl] => https://gipc.campusphere.net/iap  [host] => gipc.campusphere.net )
+适配了[idsUrl]的后缀为iap的全部学校和部分authserver的学校。
 或者你可以参考本代码以及上述[架设方法](https://github.com/ZimoLoveShuang/wisedu-unified-login-api)中的逻辑将其他学校也
 整合在一起。
 
 
 ### 使用方法
-这一步骤嫌麻烦可以先跳过申请key尝试直接做第三步替换代码，大部分学校需要验证码的原因都是短时间登录过于频繁或密码频繁错误。  
-1，注册百度账号，进入百度智能云控制台
+替换代码：
+找到`index.php`中的
 
-	https://login.bce.baidu.com/?redirect=https%3A%2F%2Fconsole.bce.baidu.com%2F
-创建普通版文字识别服务，每天免费5000次那个。
-
-2，填写`Config.php`中ToolsKey()关于'BaiDuOCRKey'具体信息：
-
-	client_id ：百度OCR API KEY	以及	client_secret ：百度OCR Secret KEY
-
-3，替换代码
-找到`SignTask.php`、`CollectMessage.php`中的
-
-    	$cookie = GetCookie($params, $apis['login-api']);//从子墨服务器获取cookie
+    	Getcookie($user['username'], $user['password'], $serviceapi);//外置API模拟登陆获取cookie
 将其更改为
 
-    	$cookie = GetCookie($params, '');//从本地获取cookie
+    	Getcookie($user['username'], $user['password']);//本地模拟登录获取cookie
+执行，若账号密码填写正确，且出现
+
+	账号密码错误或不支持该类学校模拟登录。
+说明不支持该学校的模拟登录，请改用外置API获取cookie。
 
 ## 附加特殊功能及错误排查  
 
@@ -300,30 +292,6 @@ Timer亦提供精确定时功能，使用得当可以准时签到，指~~0秒签
 	}
 	
 
-### 随机定位
-上述定时器功能能助你进入封号斗罗排行榜，下面的随机定位功能能让你环游世界，指定位层面。
-该功能会随机生成一个北半球经纬度，有一定风险，你的辅导员可能很快就到你家门口，请勿滥用。
-#### 使用方法
-在`Config.php`的User()中：
-
-	$user = [   'username'=> '账号', 'password'=>'密码', 'address'=>'地址','email'=> 'None',
-        'school'=> '', 'lon'=> '经度', 'lat'=> '纬度', 'abnormalReason'=> '在学校' ];
-	/*
-	$coordinate = RandomCoordinate();//获取随机坐标
-	$user['lon'] = $coordinate['lon'];
-	$user['lat'] = $coordinate['lat'];
-	*/
-	return $user;
-更改为:
-
-	$user = [   'username'=> '账号', 'password'=>'密码', 'address'=>'地址','email'=> 'None',
-        'school'=> '', 'lon'=> '经度', 'lat'=> '纬度', 'abnormalReason'=> '在学校' ];
-	$coordinate = RandomCoordinate();//获取随机坐标
-	$user['lon'] = $coordinate['lon'];
-	$user['lat'] = $coordinate['lat'];
-	return $user;
-#### 注意
-使用后请注意人生安全。
 
 ### 今日校园反脚本案例介绍
 由于今日校园为了防止脚本自带提交任务，大概每隔2-4星期会更改一次链接  
