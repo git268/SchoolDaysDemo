@@ -74,9 +74,9 @@
 	    $user = User();
 	    Getcookie($user['username'], $user['password'], $serviceapi);//外置API模拟登陆获取cookie 
 	    getSignTasks($user, SignAPIS());   //签到
-	    if(empty($_POST['Result']))$_POST['Result'] = '答卷提交成功！';
-	    print_r(SendNotice([$_POST['Result'], date('Y-m-d H:i:s')], $user['notice']));//推送方式
-	    echo '填写状态：'.$_POST['Result'];
+	    if(empty($_POST['tips']))$_POST['tips'] = '答卷提交成功！';
+	    print_r(SendNotice([$_POST['tips'], date('Y-m-d H:i:s')], $user['notice']));//推送方式
+	    echo '填写状态：'.$_POST['tips'];
 	}
 若你的今日校园任务是信息收集，
 可将上方的
