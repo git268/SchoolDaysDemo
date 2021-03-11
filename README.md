@@ -46,7 +46,7 @@
 	'notice'=> ['type'=>2, 'key'=> '推送方式的key']//server酱
 或
 
-	'notice'=> ['type'=>1, 'key'=> ['token', 'chant_id']]//telegram bot
+	'notice'=> ['type'=>3, 'key'=> ['token', 'chant_id']]//telegram bot
 	
 
 ### 4，学校URL填写：
