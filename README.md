@@ -75,7 +75,7 @@
 	    Getcookie($user['username'], $user['password'], $serviceapi);//外置API模拟登陆获取cookie 
 	    getSignTasks($user, SignAPIS());   //签到
 	    if(empty($_POST['Result']))$_POST['Result'] = '答卷提交成功！';
-	    print_r(SendNotice([$_POST['Result'], date('Y-m-d H:i:s')], $user['notice']['key'], $user['notice']['type']));   //Qmsg酱推送
+	    print_r(SendNotice([$_POST['Result'], date('Y-m-d H:i:s')], $user['notice']));//推送方式
 	    echo '填写状态：'.$_POST['Result'];
 	}
 若你的今日校园任务是信息收集，
@@ -88,6 +88,9 @@
 若是辅导员通知，更改为
 	
 	getQueryTasks($user, ConfirmAPIS());//辅导员通知
+若是查寝，更改为
+
+	getCheckChamber($user, AttendanceAPIS());//查寝  
 	
 注意URL`必须`使用英语单引号''填写，`不能`使用`英语双引号""`，
 中文双引号“”，中文单引号‘’，`不能`有多余`空格`，注意末尾逗号！！！
@@ -122,15 +125,16 @@
 
 	$form['form'] = FillCollectForm($res['datas']['rows'], $form['form'], true);//自动填充答卷
   
-### 签到答卷填写
+### 签到&查寝答卷填写
 
 请先完成配置填写中的步骤
 
-适用于签到，由于签到大部分为纯选择题[包括判断题]，即使手动装填也会自动填写正确答案。
-若你的签到问卷全为选择题，可以跳过此步骤，下列展示为非选择题情况。
+适用于签到和查寝，由于签到大部分为纯选择题[包括判断题]，即使手动装填也会自动填写正确答案。
+若你的签到问卷全为选择题，可以跳过此步骤，下列展示为非选择题情况。  
+`查寝`只需填写下方图片路径即可
 
 	$form = [
-		'signPhotoUrl'=> '',
+		'signPhotoUrl'=> '图片路径',
 		...
 		'extraFieldItems'=> [答案],
 		...
@@ -216,8 +220,7 @@
 
 ## API服务器篇
 
-由于使用人数多及服务器维护费用高昂，
-`Config.php`中SignAPIS、CollectAPIS的login-api即子墨API会经常连接超时导致无法返回所需cookie
+由于使用人数多及服务器维护费用高昂，子墨API会经常连接超时导致无法返回所需cookie
 解决办法有如下2种：
 
 ### 使用自行架设的服务器，
@@ -275,7 +278,8 @@
 Timer亦提供精确定时功能，使用得当可以准时签到，指~~0秒签到进入封号斗罗排行榜~~。
 要想成为封号斗罗，首先需要在任务发布前20秒左右触发启动脚本定时任务，不能少于5秒防止cookie获取失败，
 也不能超过2分钟，因为定时上限只有2分钟，且不能使用随机延时。  
-如任务在每天早上07:00:00发布。可在`SignTask.php`签到任务/`CollectMessage.php`信息收集中找到
+如任务在每天早上07:00:00发布。可在  
+`SignTask.php`签到任务/`CollectMessage.php`/信息收集/`QueryNotice.php`辅导员通知/`CheckChamber.php`查寝任务中找到
 
 	echo"<br>第二次请求获取xx任务<br>";
 	$datas = ...;//获取任务
@@ -292,28 +296,6 @@ Timer亦提供精确定时功能，使用得当可以准时签到，指~~0秒签
 	}
 	
 
-
-### 今日校园反脚本案例介绍
-由于今日校园为了防止脚本自带提交任务，大概每隔2-4星期会更改一次链接  
-这些链接都在`Config.php`中的签到/信息收集API/获取校园信息URL中
-如在大约20年11月更新时，获取校园信息URL中
-
-	'list'=> 'https://mobile.campushoy.com/v6/config/guest/tenant/list'
-更改为
-
-	'list'=> 'https://xxx/v6/config/guest/tenant/list'
-而签到API中的
-
-	'datas-url'=>'https://'.$url['host'].'/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay'
-一般会更改为
-
-	'datas-url'=>'https://'.$url['host'].'/wec-counselor-sign-apps/stu/sign/xxx'
-且DES加密的密钥也会跟随版本更新，密钥在`ToolsHelper.php`中
-
-	DESEncrypt($text, $key = 'b3L26XNL')
-此处`$key = 'b3L26XNL'`就是密钥  
-
-模拟登录API问题请阅读API服务器篇
 
 ### 简单自行排查
 
