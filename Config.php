@@ -2,38 +2,42 @@
 require_once 'ToolsHelper.php';
 //用户信息
 function User(){
-    $user = ['username'=> '账号', 'password'=>'密码', 'address'=>'地址',
-        'email'=> 'None', 'school'=> '', 'lon'=> '经度',
-        'lat'=> '纬度', 'abnormalReason'=> '在学校'  ];
+    $user = [   'username'=> '账号', 'password'=>'密码', 'lon'=> '经度', 'lat'=> '纬度',
+        'school'=> '学校全称',  'abnormalReason'=> '在学校', 'address'=>'地址',
+        'notice'=> ['type'=>'推送类型', 'key'=> '推送方式的key']
+            ];
     return $user;
-}
-//工具key
-function ToolsKey(){
-    $_POST['Tools'] = ['ServerChanKey'=> '',    //Server酱油key
-                        'QmsgKey'=> '',                    //Qmsg酱key
-                        'BaiDuOCRKey'=> [ 'grant_type' => 'client_credentials',          //百度OCR默认参数
-                                            'client_id' => '',                      //百度OCR API KEY
-                                            'client_secret' => ''   ]   ]; //百度OCR Secret KEY
 }
 //签到API
 function SignAPIS(){
-    $url = $_POST['school'];
-    $apis = [   'login-api'=> 'http://www.zimo.wiki:8080/wisedu-unified-login-api-v1.0/api/login',
-        'login-url'=> $url['idsUrl'].'/login?service='.$url['scheme'].'%3A%2F%2F'.$url['host'].'%2Fportal%2Flogin',
-        'datas-url'=> $url['scheme'].'://'.$url['host'].'/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay',
-        'task-url'=> $url['scheme'].'://'.$url['host'].'/wec-counselor-sign-apps/stu/sign/detailSignInstance',
-        'submit-url'=> $url['scheme'].'://'.$url['host'].'/wec-counselor-sign-apps/stu/sign/submitSign'];
+    $apis = [   'datas-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay',
+                'task-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/sign/detailSignInstance',
+                'photo-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/sign/previewAttachment',
+                'submit-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/sign/submitSign' ];
     return $apis;
 }
 //信息收集API
 function CollectAPIS(){
+    $apis = [   'datas-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/queryCollectorProcessingList',
+                'task-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/detailCollector',
+                'form-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/getFormFields',
+                'submit-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/submitForm'   ];
+    return $apis;
+}
+//查寝API
+function AttendanceAPIS(){
+    $apis = [   'datas-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-attendance-apps/student/attendance/getStuAttendacesInOneDay',
+                'task-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-attendance-apps/student/attendance/detailSignInstance',
+                'photo-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-attendance-apps/student/attendance/previewAttachment',
+                'submit-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-attendance-apps/student/attendance/submitSign' ];
+    return $apis;
+}
+//辅导员信息确认
+function ConfirmAPIS(){
     $url = $_POST['school'];
-    $apis = [   'login-api'=>'http://www.zimo.wiki:8080/wisedu-unified-login-api-v1.0/api/login',
-        'login-url'=> $url['idsUrl'].'/login?service='.$url['scheme'].'%3A%2F%2F'.$url['host'].'%2Fportal%2Flogin',
-        'datas-url'=> $url['scheme'].'://'.$url['host'].'/wec-counselor-collector-apps/stu/collector/queryCollectorProcessingList',
-        'task-url'=> $url['scheme'].'://'.$url['host'].'/wec-counselor-collector-apps/stu/collector/detailCollector',
-        'form-url'=> $url['scheme'].'://'.$url['host'].'/wec-counselor-collector-apps/stu/collector/getFormFields',
-        'submit-url'=> $url['scheme'].'://'.$url['host'].'/wec-counselor-collector-apps/stu/collector/submitForm'   ];
+    $apis = [   'datas-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-stu-apps/stu/notice/queryProcessingNoticeList',
+                'task-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-stu-apps/stu/notice/detailNotice',
+                'submit-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-stu-apps/stu/notice/confirmNotice'   ];
     return $apis;
 }
 //获取校园信息URL
@@ -42,33 +46,25 @@ function SchoolMessageURL(){
                 'info'=> 'https://mobile.campushoy.com/v6/config/guest/tenant/info' ];
     return $url;
 }
-//获取任务header
-function Headers($cookie){
+//获取任务请求头
+function Headers(){
     $header = [ 'Accept:application/json, text/plain, */*',
-                'User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36',
-                'Accept-Encoding:gzip,deflate','content-type:application/json', 'Cookie:'.$cookie,
-                'Accept-Language:zh-CN,en-US;q=0.8', 'Content-Type:application/json;charset=UTF-8'  ];
+        'User-Agent:Mozilla/5.0 (Linux; Android 6.0.1; vivo Y66L Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.81 Mobile Safari/537.36  cpdaily/8.2.20 wisedu/8.2.20',
+        'content-type:application/json', 'Cookie:'.$_COOKIE,
+        'Accept-Language:zh-CN,en-US;q=0.8', 'Content-Type:application/json;charset=UTF-8'  ];
     return $header;
 }
-//提交任务header
-function Headers2($cookie, $extension){
-    $header = [ 'User-Agent:Mozilla/5.0 (Linux; Android 7.0.1; OPPO R11 Plus Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Safari/537.36 okhttp/3.12.4',
-                'CpdailyStandAlone:0', 'extension:1', 'Cpdaily-Extension:'.$extension,'Cookie:'.$cookie,
-                'Content-Type:application/json; charset=utf-8', 'Accept-Encoding:gzip', 'Connection:Keep-Alive' ];
+//提交签到表单请求头
+function Headers2($extension){
+    $header = ['User-Agent:Mozilla/5.0 (Linux; Android 6.0.1; vivo Y66L Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.81 Mobile Safari/537.36  cpdaily/8.2.20 wisedu/8.2.20',
+                'CpdailyStandAlone:0', 'extension:1', 'Cpdaily-Extension:'.$extension,'Cookie:'.$_COOKIE,
+                'Content-Type:application/json; charset=utf-8', 'Connection:Keep-Alive' ];
     return $header;
 }
-//模拟登录
-function DoLoginHeader($referer, $cookie){
-    $header = [ 'Accept: application/json, text/plain, */*',
-                'Accept-Encoding: gzip,deflate, br', 'Accept-Language: zh-CN,zh;q=0.8',
-                'Connection: keep-alive', 'Referer: '.$referer, 'Cookie: '.$cookie  ];
-    return $header;
-}
-//获取验证码header
-function CaptchaHeader($cookie){
-    $header = [ 'Accept: text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2',
-                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36',
-                'Content-Type=image/jpeg;charset=UTF-8', 'Cookie: '.$cookie  ];
+//模拟登录请求头
+function DoLoginHeader($referer){
+    $header = [ 'Accept: application/json, text/plain, */*', 'Accept-Language: zh-CN,zh;q=0.8', 'Connection: keep-alive',
+                'Referer: '.$referer, 'Cookie: '.$_COOKIE, 'Content-Type:application/x-www-form-urlencoded'];
     return $header;
 }
 ?>
