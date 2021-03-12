@@ -5,8 +5,9 @@ function getSignTasks($user, $apis){//签到
     $headers = Headers();//获取请求头部
     //echo"<br>第二次请求获取签到任务<br>";
     $datas = json_decode(SendRequest($apis['datas-url'], $headers, json_encode($_POST['params'])), true)['datas']['unSignedTasks'];//获取任务
-    //print_r($datas);
     if (isset($datas[0]) && empty($_POST['tips'])){//判断有无任务及cookie是否正常
+        $time = [$datas[0]['currentTime'], $datas[0]['rateTaskBeginTime'], $datas[0]['rateTaskEndTime']];//获取任务当前、开始和结束时间
+        if(strtotime($time[0])<strtotime($time[1]) || strtotime($time[0]) > strtotime($time[2]))$_POST['tips'] = '当前没有签到任务。';//判断是否在任务时间内
         $params = ['signInstanceWid'=> $datas[0]['signInstanceWid'],'signWid'=> $datas[0]['signWid']];//获取任务wid
         //echo"<br>当前任务<br>";
         $res = json_decode(SendRequest($apis['task-url'], $headers, json_encode($params)), true)['datas'];//获取详细任务
@@ -15,7 +16,7 @@ function getSignTasks($user, $apis){//签到
         if($res['isNeedExtra'] == 1)$form['extraFieldItems'] = FillSignForm($res, $form['extraFieldItems']);//手动填充答卷
         //if($res['isNeedExtra'] == 1)$form['extraFieldItems'] = FillSignForm($res, $form['extraFieldItems'], true);//自动填充答卷
         if($res['isPhoto'] ==1)$form['signPhotoUrl'] = UploadPicture($form['signPhotoUrl'], $apis['photo-url']);//上传图片
-        echo"<br>填充表单<br>";
+        echo '<br>填充表单<br>';
         print_r($form);
         SubmitTask($apis['submit-url'], $form, $user, 2);//提交表单信息
     } else {
