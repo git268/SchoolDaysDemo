@@ -36,19 +36,22 @@
 ##### 脚本支持的推送方式：  
 'ServerChanKey' ： Server酱油key  
 'QmsgKey'：     Qmsg酱key  
-'TGKey'：	telegram bot两个参数[token与聊天id]  
+'TGKey'：	telegram bot两个参数[token与聊天id]
+'pushplus'	pushplus的token
 皆用于消息推送，使用哪个填哪个，key在`Config.php`的User中的notice。
 
 
-	'notice'=> ['type'=>1, 'key'=> '推送方式的key']//qmsg酱
+	'notice'=> ['type'=>1, 'key'=> 'qmsg的key']//qmsg酱
 或
 
-	'notice'=> ['type'=>2, 'key'=> '推送方式的key']//server酱
+	'notice'=> ['type'=>2, 'key'=> 'serverchan的key']//server酱
 或
 
 	'notice'=> ['type'=>3, 'key'=> ['token', 'chant_id']]//telegram bot
-	
+或
 
+	'notice'=> ['type'=>4, 'key'=> 'pushplus的token']//pushplus
+  
 ### 4，学校URL填写：
 因为在每次登录时适配不同学校的中查找list获得学校的host需要遍历全国各个
 学校直到找到你的学校为止。如果只设置了用户信息，默认只查找并显示你所填写学校的链接。
