@@ -36,8 +36,8 @@
 ##### 脚本支持的推送方式：  
 'ServerChanKey' ： Server酱油key  
 'QmsgKey'：     Qmsg酱key  
-'TGKey'：	telegram bot两个参数[token与聊天id]
-'pushplus'	pushplus的token
+'TGKey'：	telegram bot两个参数[token与聊天id]  
+'pushplus'	pushplus的token  
 皆用于消息推送，使用哪个填哪个，key在`Config.php`的User中的notice。
 
 
