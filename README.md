@@ -1,21 +1,16 @@
 # SchoolDaysDemo
 
-## 前言
-  众所周知的原因，几乎各大高校都得使用不同方法进行签到打卡，其中最常见的为今日校园打卡~~我猜的~~。网络上Python脚本层出不穷但都需
-要各种麻烦的依赖。本代码根据[子墨大佬](https://github.com/ZimoLoveShuang/auto-sign)的方案移植成~~世界上最好的编程语言~~，经过多次版本更替，
-支持今日校园大部分功能：签到，信息收集，辅导员通知，查寝及大部分学校的模拟登录。  
-  `注意`：请勿利用信息差盈利。本脚本将会持续更新修复Bug、扩展功能并且`永久免费`。
 
 ## 部署方法：
 
-### 1，执行环境：PHP7。
+### 1，执行环境：PHP7，建议使用本地或服务器执行，并不建议将代码包部署于云函数上，尤其是腾讯云。
 请下载release中最新版的SchoolDaysDemo.zip
-。若在非云函数下执行，请将index.php中最后一行
-
-	//main_handler();
-替换为
+。若在云函数下执行，请将index.php中最后一行
 
 	main_handler();
+替换为
+
+	//main_handler();
 若部署环境为阿里云云函数，请将index.php中的主函数
 
 	function main_handler(){
@@ -29,16 +24,34 @@
 若部署环境为腾讯云云函数，不需要修改主函数。
 
 ### 2,填写`Config.php`中User()的信息：  
-账号	密码	经/纬度[精确到小数点后5位]	学校全称	定位状态   
+使用多用户配置前建议先使用单用户模式对读者自己的账户进行测试，尤其是需要精确定位的签到&查寝经纬度。  
+网上的查询到的经纬度精确度往往不够导致任务填写失败，后续步骤会介绍如何填写任务规定的经纬度。
+#### 单用户模式：
 
-### 3,填写`Config.php`中ToolsKey()其他工具信息：
+	$user = [   'username'=> '账号', 'password'=>'密码', 'lon'=> '经度', 'lat'=> '纬度',
+        'school'=> '学校全称',  'abnormalReason'=> '在学校', 'address'=>'地址',
+        'notice'=> ['type'=>'推送类型', 'key'=> '推送方式的key']
+            ];
+#### 多用户模式：
 
-##### 脚本支持的推送方式：  
+	$user = [[  'username'=> '账号A', 'password'=>'密码A', 'lon'=> '经度', 'lat'=> '纬度',
+                'school'=> '学校全称',  'abnormalReason'=> '在学校', 'address'=>'地址',
+                    'notice'=> ['type'=>'推送类型A', 'key'=> '推送方式的key']],
+             [  'username'=> '账号B', 'password'=>'密码B', 'lon'=> '经度', 'lat'=> '纬度',
+                'school'=> '学校全称',  'abnormalReason'=> '在学校', 'address'=>'地址',
+                    'notice'=> ['type'=>'推送类型B', 'key'=> '推送方式的key']],
+             [ 'username'=> '账号C', 'password'=>'密码C', 'lon'=> '经度', 'lat'=> '纬度',
+                'school'=> '学校全称',  'abnormalReason'=> '在学校', 'address'=>'地址',
+                    'notice'=> ['type'=>'推送类型C', 'key'=> '推送方式的key']]
+    ];
+可根据次模板适当增减，注意除最后一个用户外末尾的逗号！
+
+#### 脚本支持的推送方式：  
 'ServerChanKey' ： Server酱油key  
 'QmsgKey'：     Qmsg酱key  
 'TGKey'：	telegram bot两个参数[token与聊天id]  
 'pushplus'	pushplus的token  
-皆用于消息推送，使用哪个填哪个，key在`Config.php`的User中的notice。
+皆用于消息推送，使用哪个填哪个多用户可同时使用不同的推送模式，key在`Config.php`的User中的notice。
 
 
 	'notice'=> ['type'=>1, 'key'=> 'qmsg的key']//qmsg酱
@@ -50,54 +63,8 @@
 	'notice'=> ['type'=>3, 'key'=> ['token', 'chant_id']]//telegram bot
 或
 
-	'notice'=> ['type'=>4, 'key'=> 'pushplus的token']//pushplus
-  
-### 4，学校URL填写：
-因为在每次登录时适配不同学校的中查找list获得学校的host需要遍历全国各个
-学校直到找到你的学校为止。如果只设置了用户信息，默认只查找并显示你所填写学校的链接。
-如果你的学校排名较后，这个过程会消耗大量内存，CPU资源。
-先执行一次本脚本，以今日校园学校列表中第一个加入的学校  甘肃工业职业技术学院  `为例`
-
-	https://mobile.campushoy.com/v6/config/guest/tenant/list
-
-
-控制台会输出
-
-	Array ( [idsUrl] => https://gipc.campusphere.net/iap  [host] => gipc.campusphere.net )
-
-找到`index.php`主函数function main_handler()
-若你的今日校园任务是签到，
-可替换为[必须确保个人信息没有填写错误]
-
-	function main_handler(){
-	    $serviceapi = 'http://www.zimo.wiki:8080/wisedu-unified-login-api-v1.0/api/login';//外置API
-	    $_POST['school'] = [   
-		'idsUrl' => 'https://gipc.campusphere.net/iap',
-		'host' => 'gipc.campusphere.net'    ];
-	    $user = User();
-	    Getcookie($user['username'], $user['password'], $serviceapi);//外置API模拟登陆获取cookie 
-	    getSignTasks($user, SignAPIS());   //签到
-	    if(empty($_POST['tips']))$_POST['tips'] = '答卷提交成功！';
-	    print_r(SendNotice([$_POST['tips'], date('Y-m-d H:i:s')], $user['notice']));//推送方式
-	    echo '填写状态：'.$_POST['tips'];
-	}
-若你的今日校园任务是信息收集，
-可将上方的
-
-	getSignTasks($user, SignAPIS());   //签到
-更改为
-
-	getCollectTasks($user, CollectAPIS()); //信息收集
-若是辅导员通知，更改为
+	'notice'=> ['type'=>4, 'key'=> 'pushplus的token']//pushplus 
 	
-	getQueryTasks($user, ConfirmAPIS());//辅导员通知
-若是查寝，更改为
-
-	getCheckChamber($user, AttendanceAPIS());//查寝  
-	
-注意URL`必须`使用英语单引号''填写，`不能`使用`英语双引号""`，
-中文双引号“”，中文单引号‘’，`不能`有多余`空格`，注意末尾逗号！！！
-
 若使用telegram bot推送，请使用海外服务器或自备梯子，海外IP能正常完成所有功能。  
 其中使用代理需在`ToolsHelper.php`中的SendRequest(...)方法找到：
 
@@ -105,7 +72,22 @@
 替换为：
 
 	curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:xxxx');//TG bot需要使用代理，请自备梯子  
+
+### 3,index选择任务模式：
+在`index.php`中main_handler方法内，找到：
 	
+	/*
+	getSignTasks($user[$rank[$i]], SignAPIS());   //签到
+	getCollectTasks($user[$rank[$i]], CollectAPIS()); //信息收集
+	getQueryTasks($user[$rank[$i]], ConfirmAPIS());//辅导员通知
+	getCheckChamber($user[$rank[$i]], AttendanceAPIS());//查寝
+	*/
+
+将其替换成你需要填写的任务，如
+
+	getSignTasks($user[$rank[$i]], SignAPIS());   //签到
+	
+
 ## 答案填写&自动装填机
 ### 自动装填机
 由于今日校园请求任务时会返回历史答卷或在答卷选择题中标注正确答案，为自动填写答卷提供了可能。默认为手动填充，有以下2种模式供选择：  
@@ -276,9 +258,13 @@
 若为本地执行或服务器执行，则要留意`index.php`上方
 
 	set_time_limit(150);//设置执行时间上限(150秒)
-若需紧急执行，请先在所有调用的`Timer(..);`前方更改为
+本脚本默认在`index.php`中的main_handler方法找到
 
-	//Timer(...);
+	//Timer([5, 25]);//随机延时5-25秒
+去掉前面的注释变成
+
+	Timer([5, 25]);//随机延时5-25秒
+就能提供随机延时。
 
 ### 定时器使用方法
 Timer亦提供精确定时功能，使用得当可以准时签到，指~~0秒签到进入封号斗罗排行榜~~。
