@@ -46,6 +46,7 @@
     ];
 可根据次模板适当增减，注意除最后一个用户外末尾的逗号！
 
+
 #### 脚本支持的推送方式：  
 'ServerChanKey' ： Server酱油key  
 'QmsgKey'：     Qmsg酱key  
@@ -87,6 +88,23 @@
 
 	getSignTasks($user[$rank[$i]], SignAPIS());   //签到
 	
+#### 查找任务经纬度：
+在签到/查寝任务中往往会对经纬度要求非常苛刻，我们可以根据请求详细任务时的返回查看任务规定好的经纬度。  
+在`SignTask.php`签到/`CheckChamber.php`查寝中找到：
+
+	/*
+        $address = $res['signPlaceSelected'][0];
+        $address = ['地址'=> $address['address'], '经度'=> $address['longitude'], '纬度'=> $address['latitude']];
+        echo"<br>当前需要的任务经纬度:<br>";
+        print_r($address);
+        */
+去掉注释，更改成:
+
+	$address = $res['signPlaceSelected'][0];
+        $address = ['地址'=> $address['address'], '经度'=> $address['longitude'], '纬度'=> $address['latitude']];
+        echo"<br>当前需要的任务经纬度:<br>";
+        print_r($address);
+执行脚本，就能看到控制台输出经纬度，将其填写在`Config.php`的User对应的用户里即可。
 
 ## 答案填写&自动装填机
 ### 自动装填机
