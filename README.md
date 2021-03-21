@@ -94,9 +94,10 @@
 去掉注释，更改成:
 
 	$address = $res['signPlaceSelected'][0];
-        $address = ['地址'=> $address['address'], '经度'=> $address['longitude'], '纬度'=> $address['latitude']];
-        echo"<br>当前需要的任务经纬度:<br>";
-        print_r($address);
+	$address = ['地址'=> $address['address'], '经度'=> $address['longitude'], '纬度'=> $address['latitude']];
+	echo"<br>当前需要的任务经纬度:<br>";
+	print_r($address);
+	
 执行脚本，就能看到控制台输出经纬度，将其填写在`Config.php`的User对应的用户里即可。
 
 ## 答案填写&自动装填机
@@ -114,7 +115,7 @@
 
 	if($res['isNeedExtra'] == 1)$form['extraFieldItems'] = FillSignForm($res, $form['extraFieldItems'], true);//自动填充答卷
   
-信息收集：在`CollectMessage.php`中找到：
+信息收集：在`MessageCollect.php`中找到：
 	
 	$form['form'] = FillCollectForm($res['datas']['rows'], $form['form']);//手动填充答卷
 若你若需自动装填，则更改为：
