@@ -24,8 +24,8 @@ function IapSchoolLogin($name, $pwd){
     SendRequest($_POST['params']['login_url'], [], '', 'GET', 1);//获取CONVERSATION
     $_COOKIE = PregMatchMsg($_POST['headers'], 'Set-Cookie:', ';');//正则匹配cookie
     $lt = substr(explode("_2lBepC=", $_POST['headers'])[1], 0, -4);//提取响应头中的lt
-    $form = [ 'password'=>$pwd,'captcha'=> '', 'mobile'=>'','lt'=>$lt,//构造参数
-                'rememberMe'=>'false', 'username'=>$name, 'dllt'=>''];
+    $form = [ 'password'=>$pwd, 'captcha'=> '', 'mobile'=>'', 'lt'=>$lt,//构造参数
+              'rememberMe'=>'false', 'username'=>$name, 'dllt'=>''];
     $url = 'https://'.$_POST['school']['host'].'/iap/doLogin';//登录url
     $header = DoLoginHeader($url);//登录请求头
     $res = SendRequest($url, $header, http_build_query($form), 'POST', 1);//获取MOD_AUTH_CAS
