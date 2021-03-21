@@ -71,15 +71,15 @@
 在`index.php`中main_handler方法内，找到：
 	
 	/*
-	getSignTasks($user[$rank[$i]], SignAPIS());   //签到
-	getCollectTasks($user[$rank[$i]], CollectAPIS()); //信息收集
-	getQueryTasks($user[$rank[$i]], ConfirmAPIS());//辅导员通知
-	getCheckChamber($user[$rank[$i]], AttendanceAPIS());//查寝
+	getSignTasks($user[$i], SignAPIS());   //签到
+	getCollectTasks($user[$i], CollectAPIS()); //信息收集
+	getQueryTasks($user[$i], ConfirmAPIS());//辅导员通知
+	getCheckChamber($user[$i], AttendanceAPIS());//查寝
 	*/
 
 将其替换成你需要填写的任务，如
 
-	getSignTasks($user[$rank[$i]], SignAPIS());   //签到
+	getSignTasks($user[$i], SignAPIS());   //签到
 	
 #### 查找任务经纬度：
 在签到/查寝任务中往往会对经纬度要求非常苛刻，我们可以根据请求详细任务时的返回查看任务规定好的经纬度。  
