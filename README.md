@@ -11,6 +11,12 @@
 替换为
 
 	//main_handler();
+
+
+### 2,选择你的版本：
+云函数版：适用于腾讯云，但近期腾讯云并不稳定，建议使用阿里云云函数。  
+云函数版默认使用外置API增加稳定性，不推荐使用多用户及内置模拟登陆。  
+
 若部署环境为阿里云云函数，请将index.php中的主函数
 
 	function main_handler(){
@@ -21,65 +27,49 @@
 	function handler(){
 		...
 	}
+  
+服务器版：可部署于本地或服务器上，更加适用于多用户。自带多用户乱序排序与随机延时，更好模拟真实情况。
 
-### 2,填写`Config.php`中User()的信息：  
+
+### 3,填写`Config.php`中User()的信息：  
 使用多用户配置前建议先使用读者自己的账户进行测试，尤其是需要精确定位的签到&查寝经纬度。  
 网上的查询到的经纬度精确度往往不够导致任务填写失败，后续步骤会介绍如何填写任务规定的经纬度。
 #### 用户信息填写：
 
-	$user = [[  'username'=> '账号A', 'password'=>'密码A', 'lon'=> '经度', 'lat'=> '纬度',
+	$user = [
+		[  'username'=> '账号A', 'password'=>'密码A', 'lon'=> '经度', 'lat'=> '纬度',
                 'school'=> '学校全称',  'abnormalReason'=> '在学校', 'address'=>'地址',
-                    'notice'=> ['type'=>'推送类型A', 'key'=> '推送方式的key']],
-             [  'username'=> '账号B', 'password'=>'密码B', 'lon'=> '经度', 'lat'=> '纬度',
+                'mode'=> '任务A', 'notice'=> ['type'=>'推送类型A', 'key'=> '推送方式的key']],
+             	[  'username'=> '账号B', 'password'=>'密码B', 'lon'=> '经度', 'lat'=> '纬度',
                 'school'=> '学校全称',  'abnormalReason'=> '在学校', 'address'=>'地址',
-                    'notice'=> ['type'=>'推送类型B', 'key'=> '推送方式的key']],
-             [ 'username'=> '账号C', 'password'=>'密码C', 'lon'=> '经度', 'lat'=> '纬度',
+                 'mode'=> '任务B', 'notice'=> ['type'=>'推送类型B', 'key'=> '推送方式的key']],
+             	[ 'username'=> '账号C', 'password'=>'密码C', 'lon'=> '经度', 'lat'=> '纬度',
                 'school'=> '学校全称',  'abnormalReason'=> '在学校', 'address'=>'地址',
-                    'notice'=> ['type'=>'推送类型C', 'key'=> '推送方式的key']]
+                 'mode'=> '任务C', 'notice'=> ['type'=>'推送类型C', 'key'=> '推送方式的key']]
     ];
 可根据次模板适当增减，注意除最后一个用户外末尾的逗号！
 
+#### 选择任务模式：
+在`Config.php`中User()方法内，找到每个用户的个人信息：
 
-#### 脚本支持的推送方式：  
-'ServerChanKey' ： Server酱油key  
-'QmsgKey'：     Qmsg酱key  
-'TGKey'：	telegram bot两个参数[token与聊天id]  
-'pushplus'	pushplus的token  
-皆用于消息推送，使用哪个填哪个多用户可同时使用不同的推送模式，key在`Config.php`的User中的notice。
+	[
+	...
+	'mode'=> '任务A', 
+	...],
 
 
-	'notice'=> ['type'=>1, 'key'=> 'qmsg的key']//qmsg酱
-或
+若为签到任务，替换为：
 
-	'notice'=> ['type'=>2, 'key'=> 'serverchan的key']//server酱
-或
+	'mode'=> 1, 
+若为信息收集：
 
-	'notice'=> ['type'=>3, 'key'=> ['token', 'chant_id']]//telegram bot
-或
+	'mode'=> 2, 
+若为辅导员通知：
 
-	'notice'=> ['type'=>4, 'key'=> 'pushplus的token']//pushplus 
-	
-若使用telegram bot推送，请使用海外服务器或自备梯子，海外IP能正常完成所有功能。  
-其中使用代理需在`ToolsHelper.php`中的SendRequest(...)方法找到：
+	'mode'=> 3, 
+若为查寝任务：
 
-	//curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:你的梯子端口号');//TG bot需要使用代理，请自备梯子
-替换为：
-
-	curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:xxxx');//TG bot需要使用代理，请自备梯子  
-
-### 3,index选择任务模式：
-在`index.php`中main_handler方法内，找到：
-	
-	/*
-	getSignTasks($user[$i], SignAPIS());   //签到
-	getCollectTasks($user[$i], CollectAPIS()); //信息收集
-	getQueryTasks($user[$i], ConfirmAPIS());//辅导员通知
-	getCheckChamber($user[$i], AttendanceAPIS());//查寝
-	*/
-
-将其替换成你需要填写的任务，如
-
-	getSignTasks($user[$i], SignAPIS());   //签到
+	'mode'=> 4, 
 	
 #### 查找任务经纬度：
 在签到/查寝任务中往往会对经纬度要求非常苛刻，我们可以根据请求详细任务时的返回查看任务规定好的经纬度。  
@@ -99,6 +89,35 @@
 	print_r($address);
 	
 执行脚本，就能看到控制台输出经纬度，将其填写在`Config.php`的User对应的用户里即可。
+
+
+#### 脚本支持的推送方式：  
+'ServerChanKey' ： Server酱油key  
+'QmsgKey'：     Qmsg酱key  
+'TGKey'：	telegram bot两个参数[token与聊天id]  
+'pushplus'	pushplus的token  
+皆用于消息推送，使用哪个填哪个多用户可同时使用不同的推送模式，key在`Config.php`的User中的notice。
+
+
+	'notice'=> ['type'=>1, 'key'=> 'qmsg的key']//qmsg酱
+或
+
+	'notice'=> ['type'=>2, 'key'=> 'serverchan的key']//server酱
+或
+
+	'notice'=> ['type'=>3, 'token'=> 'TGtoken', 'chant_id'=> 'TGchatid']//telegram bot
+或
+
+	'notice'=> ['type'=>4, 'key'=> 'pushplus的token']//pushplus 
+	
+若使用telegram bot推送，请使用海外服务器或自备梯子，海外IP能正常完成所有功能。  
+其中使用代理需在`ToolsHelper.php`中的SendRequest(...)方法找到：
+
+	//curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:你的梯子端口号');//TG bot需要使用代理，请自备梯子
+替换为：
+
+	curl_setopt($curl, CURLOPT_PROXY, 'http://127.0.0.1:xxxx');//TG bot需要使用代理，请自备梯子  
+
 
 ## 答案填写&自动装填机
 ### 自动装填机
