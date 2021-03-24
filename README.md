@@ -14,21 +14,22 @@
 
 
 ### 2,选择你的版本：
-云函数版：适用于腾讯云，但近期腾讯云并不稳定，建议使用阿里云云函数。  
+云函数版：`[SchoolDay_v1.73A]`适用于腾讯云，但近期腾讯云并不稳定，建议使用阿里云云函数。  
 云函数版默认使用外置API增加稳定性，不推荐使用多用户及内置模拟登陆。  
 
-若部署环境为阿里云云函数，请将index.php中的主函数
+默认为阿里云云函数，若部署环境为腾讯云云函数，请将index.php中的主函数
 
-	function main_handler(){
+	function handler(){
 		...
 	}
 函数名更改为
 	
-	function handler(){
+	function main_handler(){
 		...
 	}
   
-服务器版：可部署于本地或服务器上，更加适用于多用户。自带多用户乱序排序与随机延时，更好模拟真实情况。
+服务器版：`[SchoolDay_v1.73B]`可部署于本地或服务器上，更加适用于多用户。自带多用户乱序排序与随机延时，更好模拟真实情况。  
+支持图片上传，自带今日校园精简学校列表，加快读取速度。
 
 
 ### 3,填写`Config.php`中User()的信息：  
@@ -175,7 +176,8 @@
 	'signPhotoUrl'=> '',
 改成
 
-	'signPhotoUrl'=> '图片路径',//图片路径如savefile/sample.png
+	'signPhotoUrl'=> '图片路径',//图片路径如SaveFile/sample.png
+`注意`：图片上传需要读取权限，某些服务器甚至需要填写图片绝对路径。  
 该功能需要执行环境有读取权限，云函数一般不支持该功能。若你没有图床也没有适合的执行环境，且辅导员不看提交内容，
 可填写今日校园的官网logo图片路径：
 	
@@ -239,37 +241,30 @@
 
 ## API服务器篇
 
-由于使用人数多及服务器维护费用高昂，子墨API会经常连接超时导致无法返回所需cookie
-解决办法有如下2种：
+### 使用自带的`SimulationLogin.php`
+本PHP文件对各种学校的云端登录进行抓包以获取cookie，但并未适配全部学校。默认使用内置的模拟登陆。
 
-### 使用自行架设的服务器，
+### 使用zimo的模拟登陆服务器[外置API模拟登陆]，
+由于使用人数多及服务器维护费用高昂，子墨API会经常连接超时导致无法返回所需cookie
 即将`index.php`中
 
 	$serviceapi ='http://你的服务器IP地址:端口号/wisedu-unified-login-api-v1.0/api/login';
 [架设方法](https://github.com/ZimoLoveShuang/wisedu-unified-login-api)
 
-### 使用本脚本自带的`SimulationLogin.php`
-本PHP文件对各种学校的云端登录进行抓包以获取cookie，但并未适配全部学校。
-先说局限性，在配置填写中，我们在填写学校URL步骤时控制台会输出如下
 
-	Array ( [idsUrl] => https://gipc.campusphere.net/iap  [host] => gipc.campusphere.net )
-适配了[idsUrl]的后缀为iap的全部学校和部分authserver的学校。
-或者你可以参考本代码以及上述[架设方法](https://github.com/ZimoLoveShuang/wisedu-unified-login-api)中的逻辑将其他学校也
-整合在一起。
 
 
 ### 使用方法
 替换代码：
 找到`index.php`中的
 
-    	Getcookie($user['username'], $user['password'], $serviceapi);//外置API模拟登陆获取cookie
+	Getcookie($user['username'], $user['password']);//本地模拟登录获取cookie
 将其更改为
 
-    	Getcookie($user['username'], $user['password']);//本地模拟登录获取cookie
+	Getcookie($user['username'], $user['password'], $serviceapi);//外置API模拟登陆获取cookie
+    	
 执行，若账号密码填写正确，且出现
 
-	账号密码错误或不支持该类学校模拟登录。
-说明不支持该学校的模拟登录，请改用外置API获取cookie。
 
 ## 附加特殊功能及错误排查  
 
