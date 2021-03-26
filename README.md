@@ -7,10 +7,10 @@
 请下载release中最新版的SchoolDaysDemo.zip
 。若在云函数下执行，请将index.php中最后一行
 
-	main_handler();
+	handler();
 替换为
 
-	//main_handler();
+	//handler();
 
 
 ### 2,选择你的版本：
