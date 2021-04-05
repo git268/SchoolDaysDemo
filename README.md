@@ -4,13 +4,7 @@
 ## 部署方法：
 
 ### 1，执行环境：PHP7，建议使用本地或服务器执行，并不建议将代码包部署于云函数上，尤其是腾讯云。
-请下载release中最新版的SchoolDaysDemo.zip
-。若在云函数下执行，请将index.php中最后一行
-
-	handler();
-替换为
-
-	//handler();
+请下载release中最新版的SchoolDaysDemo.zip。
 
 
 ### 2,选择你的版本：
