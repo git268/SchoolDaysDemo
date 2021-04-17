@@ -5,6 +5,7 @@ function getCollectTasks($user, $apis) {//信息收集
     $headers = TaskHeader();//获取请求头部
     //echo "<br>第二次请求获取信息收集任务<br>";
     $datas = json_decode(SendRequest($apis['datas-url'], $headers, json_encode(['pageSize' => 6, 'pageNumber' => 1])), true)['datas']['rows'];//获取任务
+    //print_r($datas);
     if (isset($datas[0]) && empty($_POST['tips'])){//判断有无任务及cookie是否正常
         $collectWid = $datas[0]['wid'];//获取任务wid
         $formWid = $datas[0]['formWid'];
@@ -15,8 +16,8 @@ function getCollectTasks($user, $apis) {//信息收集
         //print_r($res);
         //echo "<br>填充表单<br>";
         $form = CollectForm($formWid, $collectWid, $schoolTaskWid['collector']['schoolTaskWid'], $user);//获取答卷
-        //$form['form'] = FillCollectForm($res['datas']['rows'], $form['form']);//手动填充答卷
-        $form['form'] = FillCollectForm($res['datas']['rows'], $form['form'], true);//自动填充答卷
+        $form['form'] = FillCollectForm($res['datas']['rows'], $form['form'], [$apis['put-photo'], $apis['get-photo']]);//手动填充答卷
+        //$form['form'] = FillCollectForm($res['datas']['rows'], $form['form'], [$apis['put-photo'], $apis['get-photo']], true);//自动填充答卷
         //print_r($form);
         SubmitTask($apis['submit-url'], $form, $user, 1);//提交表单
     }else{
@@ -24,18 +25,24 @@ function getCollectTasks($user, $apis) {//信息收集
     }
 }
 //填充信息收集答卷
-function FillCollectForm($fillarr, $keyarr, $mode=false, $flag=0){
+function FillCollectForm($fillarr, $keyarr, $photo, $mode=false, $flag=0){
     foreach ($fillarr as $keyname => $keyvalue){//遍历问题
         if ($keyvalue['isRequired'] == 1) {//必填项
-            if ($keyvalue['fieldType']==2 || $keyvalue['fieldType']==3) {//填充单选/多选
-                if($mode)//根据装填模式选择问卷
-                    $correctkey = DelSurplusOption($fillarr[$keyname]['fieldItems'], [], $mode);//全自动构造答卷
-                else
-                    $correctkey = DelSurplusOption($fillarr[$keyname]['fieldItems'], $keyarr[$flag], $mode);//手动构造答卷
-                $fillarr[$keyname]['fieldItems'] = $correctkey[0];//保留正确选项
-                $fillarr[$keyname]['value'] = $correctkey[1];   //填充答案
-            }else{//填充文本、图片。图片功能需要填写路径
-                if(!$mode)$fillarr[$keyname]['value'] = $keyarr[$flag];
+            switch($keyvalue['fieldType']){//判断题目类型
+                case $keyvalue['fieldType']==2 || $keyvalue['fieldType']==3://填充单选/多选
+                    if($mode)//根据装填模式选择问卷
+                        $correctkey = DelSurplusOption($fillarr[$keyname]['fieldItems'], [], $mode);//全自动构造答卷
+                    else
+                        $correctkey = DelSurplusOption($fillarr[$keyname]['fieldItems'], $keyarr[$flag], $mode);//手动构造答卷
+                    $fillarr[$keyname]['fieldItems'] = $correctkey[0];//保留正确选项
+                    $fillarr[$keyname]['value'] = $correctkey[1];   //填充答案
+                    break;
+                case $keyvalue['fieldType']==4://图片
+                    if(!$mode)$fillarr[$keyname]['value'] = UploadPicture($keyarr[$flag], $photo[0], $photo[1]);//上传图片
+                    break;
+                default://填充文本
+                    if(!$mode)$fillarr[$keyname]['value'] = $keyarr[$flag];
+                    break;
             }
             if(empty($fillarr[$keyname]['value'])){//填充自检
                 $_POST['tips'] = $keyvalue['sort'].': '.$keyvalue['title'].'填写失败。';//返回报错

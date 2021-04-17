@@ -16,7 +16,6 @@ function User(){
     return $user;
 }
 //签到API
-//签到API
 function SignAPIS(){
     $apis = [   'datas-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay',
         'task-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/sign/detailSignInstance',
@@ -30,6 +29,8 @@ function CollectAPIS(){
     $apis = [   'datas-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/queryCollectorProcessingList',
         'task-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/detailCollector',
         'form-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/getFormFields',
+        'put-photo'=>'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/oss/getUploadPolicy',
+        'get-photo'=> 'https://'.$_POST['school']['host'].'/wec-counselor-attendance-apps/student/attendance/previewAttachment',
         'submit-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/submitForm'   ];
     return $apis;
 }
@@ -65,7 +66,7 @@ function TaskHeader(){
 }
 //提交签到表单请求头
 function SubmitHeader($extension){
-    $header = ['User-Agent:Mozilla/5.0 (Linux; Android 6.0.1; vivo Y66L Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.81 Mobile Safari/537.36  cpdaily/8.2.20 wisedu/8.2.20',
+    $header = [ 'User-Agent:Mozilla/5.0 (Linux; Android 6.0.1; vivo Y66L Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.81 Mobile Safari/537.36  cpdaily/8.2.20 wisedu/8.2.20',
                 'CpdailyStandAlone:0', 'extension:1', 'Cpdaily-Extension:'.$extension,'Cookie:'.$_COOKIE,
                 'Content-Type:application/json; charset=utf-8', 'Connection:Keep-Alive' ];
     return $header;
@@ -73,6 +74,7 @@ function SubmitHeader($extension){
 //模拟登录请求头
 function DoLoginHeader($referer){
     $header = [ 'Accept: application/json, text/plain, */*', 'Accept-Language: zh-CN,zh;q=0.8', 'Connection: keep-alive',
+        'User-Agent:Mozilla/5.0 (Linux; Android 6.0.1; vivo Y66L Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.81 Mobile Safari/537.36  cpdaily/8.2.20 wisedu/8.2.20',
                 'Referer: '.$referer, 'Cookie: '.$_COOKIE, 'Content-Type:application/x-www-form-urlencoded'];
     return $header;
 }
