@@ -17,7 +17,11 @@ function getCollectTasks($user, $apis) {//信息收集
         //echo "<br>填充表单<br>";
         $form = CollectForm($formWid, $collectWid, $schoolTaskWid['collector']['schoolTaskWid'], $user);//获取答卷
         $form['form'] = FillCollectForm($res['datas']['rows'], $form['form'], [$apis['put-photo'], $apis['get-photo']]);//手动填充答卷
+<<<<<<< HEAD:SchoolDay_v1.74A/MessageCollect.php
         //$form['form'] = FillCollectForm($res['datas']['rows'], $form['form'], [$apis['put-photo'], $apis['get-photo']], true);//自动填充答卷
+=======
+        //$form['form'] = FillCollectForm($res['datas']['rows'], $form['form'], [$apis['put-photo'], $apis['get-photo']],true);//自动填充答卷
+>>>>>>> df9160a9454142ee84a5e0b60c99dacde310e0b4:SchoolDay_v1.73A/MessageCollect.php
         //print_r($form);
         SubmitTask($apis['submit-url'], $form, $user, 1);//提交表单
     }else{
@@ -38,7 +42,11 @@ function FillCollectForm($fillarr, $keyarr, $photo, $mode=false, $flag=0){
                     $fillarr[$keyname]['value'] = $correctkey[1];   //填充答案
                     break;
                 case $keyvalue['fieldType']==4://图片
+<<<<<<< HEAD:SchoolDay_v1.74A/MessageCollect.php
                     if(!$mode)$fillarr[$keyname]['value'] = UploadPicture($keyarr[$flag], $photo[0], $photo[1]);//上传图片
+=======
+                    $fillarr[$keyname]['value'] = UploadPicture($keyarr[$flag], $photo[0], $photo[1]);//上传图片
+>>>>>>> df9160a9454142ee84a5e0b60c99dacde310e0b4:SchoolDay_v1.73A/MessageCollect.php
                     break;
                 default://填充文本
                     if(!$mode)$fillarr[$keyname]['value'] = $keyarr[$flag];
