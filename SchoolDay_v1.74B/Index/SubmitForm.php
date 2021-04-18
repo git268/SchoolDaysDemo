@@ -31,7 +31,7 @@ function SignForm($wid, $user){
     $form = [   'signPhotoUrl'=> 'SaveFile/1.jpg',//图片路径
         'extraFieldItems'=> [],
         'signInstanceWid'=> $wid, 'longitude'=> $user['lon'], 'latitude'=> $user['lat'], 'isMalposition'=> '0',
-        'abnormalReason'=> $user['abnormalReason'], 'position'=> $user['address'], 'uaIsCpadaily'=> true ];
+        'abnormalReason'=> $user['abnormalReason'], 'position'=> $user['address'], 'uaIsCpadaily'=> true, 'signVersion'=> '1.0.0' ];
     return $form;
 }
 //信息收集答卷
