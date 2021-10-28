@@ -4,34 +4,55 @@ require_once 'ToolsHelper.php';
 function SubmitTask($url, $form, $user, $type, $headers = ''){
     switch($type){
         case '1'://信息收集
-            $extension = [  'model'=> 'OPPO R11 Plus', 'appVersion'=> '8.2.14', 'systemVersion'=> '7.0.1',
+            $extension = [  'model'=> 'ONEPLUS A6000', 'appVersion'=> '9.0.12', 'systemVersion'=> '11.0.2',
                 'userId'=> $user['username'], 'systemName'=> 'android', 'lon'=> $user['lon'],
                 'lat'=> $user['lat'], 'deviceId'=> UUID()   ];
+            ksort($extension,SORT_STRING);
             $headers = SubmitHeader(DESEncrypt(json_encode($extension)));//信息收集提交请求头
             $headers[] = 'Host:'.$_POST['school']['host'];//添加请求头信息
             break;
         case '2'://签到
-            $extension = [  'appVersion' => '8.2.14', 'systemName' => 'android',  'model' => 'OPPO R11 Plus',
-                'lon' => $user['lon'], 'systemVersion' => '7.0.1', 'deviceId' => UUID(), 'lat' => $user['lat']  ];
+            $extension = [  'appVersion' => '9.0.12', 'systemName' => 'android',  'model' => 'ONEPLUS A6000',
+                'lon' => $user['lon'], 'systemVersion' => '11.0.2', 'deviceId' => UUID(), 'lat' => $user['lat']  ];
+            ksort($extension,SORT_STRING);
             $headers = SubmitHeader(DESEncrypt(json_encode($extension)));  //签到提交请求头
             break;
         case '3'://辅导员通知&查寝
-            $extension = [  'lon' => $user['lon'], 'model' => 'OPPO R11 Plus','appVersion' => '8.2.14',
-                'systemVersion' => '7.0.1', 'userId'=> $user['username'],'systemName' => 'android',
+            $extension = [  'lon' => $user['lon'], 'model' => 'ONEPLUS A6000','appVersion' => '9.0.12',
+                'systemVersion' => '11.0.2', 'userId'=> $user['username'],'systemName' => 'android',
                 'lat' => $user['lat'],'deviceId' => UUID() ];
+            ksort($extension,SORT_STRING);
             $headers = SubmitHeader(DESEncrypt(json_encode($extension)));  //签到提交请求头
             $headers[] = 'Host:'.$_POST['school']['host'];//添加请求头信息
             break;
     }
-    if (empty($_POST['tips']))$res = json_decode(SendRequest($url, $headers, json_encode($form)), true);//返回提交状态
+    //file_put_contents('../SaveFile/'.$user['username'].'form.txt', json_encode($form, JSON_UNESCAPED_UNICODE));//保存答卷到本地，请勿在云函数使用！
+    $ver = "9.0.12";
+    $signeddata = json_encode($form);
+    $data = ['lon' => $user['lon'], 'calVersion' => 'fistv', 'version' => 'first_v2', 'lat' => $user['lat']];
+    if($ver != ""){
+        //新版本加密，json_encode($form) ==> $signeddata
+        $bodyString = AESEncrypt($signeddata);
+        $extension['bodyString'] = $bodyString;
+        ksort($extension,SORT_STRING);
+        $sign_tmp = http_build_query($extension).'&'.AESKEY;
+        $sign = md5($sign_tmp);
+        $data['sign'] = $sign;
+        $data['bodyString '] = $bodyString;
+    }
+
+    if (empty($_POST['tips']))
+        $res = json_decode(SendRequest($url, $headers, json_encode($data)), true);//返回提交状态
+        //print_r($res);
+        //die();
     if (isset($res) && $res['message'] != 'SUCCESS') $_POST['tips'] = '答卷提交失败，原因是：'.$res['message'];
 }
 //签到&查寝任务答卷
 function SignForm($wid, $user){
-    $form = [   'signPhotoUrl'=> 'SaveFile/1.jpg',//图片路径
+    $form = [   'signPhotoUrl'=> $user['photo'],//图片路径
         'extraFieldItems'=> [],
         'signInstanceWid'=> $wid, 'longitude'=> $user['lon'], 'latitude'=> $user['lat'], 'isMalposition'=> '0',
-        'abnormalReason'=> $user['abnormalReason'], 'position'=> $user['address'], 'uaIsCpadaily'=> true, 'signVersion'=> '1.0.0' ];
+        'abnormalReason'=> $user['abnormalReason'], 'position'=> $user['address'], 'uaIsCpadaily'=> true, 'sign'=> ''];
     return $form;
 }
 //信息收集答卷
@@ -50,11 +71,17 @@ function CollectForm($fwid, $cwid, $swid, $user){//三个必填wid+地址经纬�
     return $data;
 }
 //DES加密
-function DESEncrypt($text, $key = 'b3L26XNL'){
+function DESEncrypt($text, $key = DESKEY){
     $iv = "\x01\x02\x03\x04\x05\x06\x07\x08";//初始向量
     $pad = 8 - (strlen($text) % 8);
     $text =$text . str_repeat(chr($pad), $pad);//PKCS5填充
     $res = openssl_encrypt($text, 'DES-CBC', $key, OPENSSL_NO_PADDING, $iv);//加密
+    return base64_encode($res);//base64编码
+}
+//AES加密-128-CBC
+function AESEncrypt($text, $key = AESKEY){
+    $iv = "\x01\x02\x03\x04\x05\x06\x07\x08";//初始向量
+    $res = openssl_encrypt($text, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $iv);//加密
     return base64_encode($res);//base64编码
 }
 //系统随机数，任务唯一标识

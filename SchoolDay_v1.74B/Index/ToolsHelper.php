@@ -1,9 +1,12 @@
 <?php
+const DESKEY = 'b3L26XNL';
+const AESKEY = 'ytUQ7l2ZZu8mLvJZ';
+
 //结果推送
 function SendNotice($content, $notice){
     switch($notice['type']) {
         case 1: //Qmsg酱
-            $url = 'https://qmsg.zendee.cn/send/' .$notice['key'] . '?' .
+            $url = 'https://qmsg.zendee.cn/send/' .$notice['key'] . '?qq='.$notice['qq'].'&' .
                 http_build_query(['msg' => $content[0] . '     ' . $content[1]]);
             break;
         case 2: //Server酱
@@ -72,4 +75,5 @@ function Timer($time){
         echo '定时结束。  '.date('H:i:s');
     }
 }
+
 ?>

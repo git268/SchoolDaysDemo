@@ -6,9 +6,9 @@ require_once '../Task/QueryNotice.php';//辅导员通知
 require_once '../Task/CheckChamber.php';//查寝
 require_once '../Login/SimulationLogin.php';//模拟登录
 date_default_timezone_set('PRC');//设置北京时间
-set_time_limit(900);//设置执行时间上限(900秒)
+set_time_limit(2000);//设置执行时间上限(900秒)
 function main_handler(){
-    //$serviceapi = 'http://www.zimo.wiki:8080/wisedu-unified-login-api-v1.0/api/login';//外置API
+    //$serviceapi = 'http://xxx.com/wisedu-unified-login-api-v1.0/api/login';//外置API
     $time = date('Y-m-d H:i:s');//起始时间
     $user = User();
     $url = SchoolMessageURL();
@@ -18,7 +18,7 @@ function main_handler(){
     $rank = RandomList($i);//生成随机唯一id
     $list = json_decode(file_get_contents('../SaveFile/list.txt'), true);//本地获取list
     for(; $i >= 0; $i--){
-        //Timer([10, 27]);//随机延时10-27秒
+        Timer([1, 2]);//随机延时1-2秒
         FindSchoolUrl($list, $user[$rank[$i]]['school'], $url['info']);
         if(isset($_POST['school'])){
             //Getcookie($user[$rank[$i]]['username'], $user[$rank[$i]]['password'], $serviceapi);//外置API模拟登陆获取cookie
@@ -57,6 +57,18 @@ function main_handler(){
     }
     $time = strtotime(date('Y-m-d H:i:s')) - strtotime($time);//结束时间
     echo '任务完成，耗时 : '.$time."秒\n";
+    if(false){
+        //如果需要精简的pushplus通知，请把第60行的false改成true，并注释掉第49行。
+        $result = ob_get_contents();
+        $condition1 = substr_count($result,"收集已填写无") != count($user);
+        $condition2 = substr_count($result,"答卷提交成功") == count($user);
+        if($condition2)
+            $result = "全部提交成功";
+        if($condition1)
+            SendNotice(["签到日志", $result], ['type'=>4, 'key'=> 'pushpluskey']);
+        ob_end_flush();
+    }
+    
 }
 //查找是否支持该学校
 function FindSchoolUrl ($list, $name, $info){//查找键值
