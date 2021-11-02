@@ -4,7 +4,7 @@ require_once 'ToolsHelper.php';
 function SubmitTask($url, $form, $user, $type, $headers = ''){
     switch($type){
         case '1'://信息收集
-            $extension = [  'model'=> 'ONEPLUS A6000', 'appVersion'=> '9.0.12', 'systemVersion'=> '11.0.2',
+            $extension = [  'model'=> MOBILETYPE, 'appVersion'=> APPVERSION, 'systemVersion'=> '11.0.2',
                 'userId'=> $user['username'], 'systemName'=> 'android', 'lon'=> $user['lon'],
                 'lat'=> $user['lat'], 'deviceId'=> UUID()   ];
             ksort($extension,SORT_STRING);
@@ -12,13 +12,13 @@ function SubmitTask($url, $form, $user, $type, $headers = ''){
             $headers[] = 'Host:'.$_POST['school']['host'];//添加请求头信息
             break;
         case '2'://签到
-            $extension = [  'appVersion' => '9.0.12', 'systemName' => 'android',  'model' => 'ONEPLUS A6000',
+            $extension = [  'appVersion' => APPVERSION, 'systemName' => 'android',  'model' => MOBILETYPE,
                 'lon' => $user['lon'], 'systemVersion' => '11.0.2', 'deviceId' => UUID(), 'lat' => $user['lat']  ];
             ksort($extension,SORT_STRING);
             $headers = SubmitHeader(DESEncrypt(json_encode($extension)));  //签到提交请求头
             break;
         case '3'://辅导员通知&查寝
-            $extension = [  'lon' => $user['lon'], 'model' => 'ONEPLUS A6000','appVersion' => '9.0.12',
+            $extension = [  'lon' => $user['lon'], 'model' => MOBILETYPE,'appVersion' => APPVERSION,
                 'systemVersion' => '11.0.2', 'userId'=> $user['username'],'systemName' => 'android',
                 'lat' => $user['lat'],'deviceId' => UUID() ];
             ksort($extension,SORT_STRING);
@@ -27,22 +27,43 @@ function SubmitTask($url, $form, $user, $type, $headers = ''){
             break;
     }
     //file_put_contents('../SaveFile/'.$user['username'].'form.txt', json_encode($form, JSON_UNESCAPED_UNICODE));//保存答卷到本地，请勿在云函数使用！
-    $ver = "9.0.12";
-    $signeddata = json_encode($form);
-    $data = ['lon' => $user['lon'], 'calVersion' => 'fistv', 'version' => 'first_v2', 'lat' => $user['lat']];
-    if($ver != ""){
-        //新版本加密，json_encode($form) ==> $signeddata
-        $bodyString = AESEncrypt($signeddata);
-        $extension['bodyString'] = $bodyString;
-        ksort($extension,SORT_STRING);
-        $sign_tmp = http_build_query($extension).'&'.AESKEY;
+    $aesver = true;
+    $data4sign = array(); //给sign加密用的数据
+    $data4bs = $form; //给bodyString加密用的数据
+    if($aesver){
+        //BODYSTRING
+        $data4bs['longitude'] = $user['lon'];
+        $data4bs['latitude'] = $user['lat'];
+        $data4bs['isMalposition'] = '0';
+        $data4bs['abnormalReason'] = $user['abnormalReason'];
+        $data4bs['position'] = $user['address'];
+        $data4bs['uaIsCpadaily'] = true;
+        $bodyString = AESEncrypt2(json_encode($data4bs),AESKEY);
+        //SIGN
+        $data4sign['appVersion'] = APPVERSION;
+        $data4sign['bodyString'] = $bodyString;
+        $data4sign['deviceId'] = $extension['deviceId'];
+        $data4sign['lat'] = $user['lat'];
+        $data4sign['lon'] = $user['lon'];
+        $data4sign['model'] = MOBILETYPE;
+        $data4sign['systemName'] = 'android';
+        $data4sign['systemVersion'] = '11.0.2';
+        $data4sign['userId'] = $user['username'];
+        ksort($data4sign,SORT_STRING);
+        $sign_tmp = http_build_query(($data4sign)).'&'.AESKEY;
+        print_r($sign_tmp);
         $sign = md5($sign_tmp);
-        $data['sign'] = $sign;
-        $data['bodyString '] = $bodyString;
+        //FINAL RESULT
+        $forSubmit = $extension;
+        $forSubmit['calVersion'] = 'firstv';
+        $forSubmit['version'] = 'first_v2';
+        $forSubmit['sign'] = $sign;
+        $forSubmit['bodyString'] = $bodyString;
+        ksort($forSubmit,SORT_STRING);
     }
 
     if (empty($_POST['tips']))
-        $res = json_decode(SendRequest($url, $headers, json_encode($data)), true);//返回提交状态
+        $res = json_decode(SendRequest($url, $headers, json_encode($forSubmit)), true);//返回提交状态
         //print_r($res);
         //die();
     if (isset($res) && $res['message'] != 'SUCCESS') $_POST['tips'] = '答卷提交失败，原因是：'.$res['message'];
@@ -78,10 +99,22 @@ function DESEncrypt($text, $key = DESKEY){
     $res = openssl_encrypt($text, 'DES-CBC', $key, OPENSSL_NO_PADDING, $iv);//加密
     return base64_encode($res);//base64编码
 }
-//AES加密-128-CBC
-function AESEncrypt($text, $key = AESKEY){
-    $iv = "\x01\x02\x03\x04\x05\x06\x07\x08";//初始向量
-    $res = openssl_encrypt($text, 'AES-128-CBC', $key, OPENSSL_RAW_DATA, $iv);//加密
+//AES加密
+function AESEncrypt($text, $key=AESKEY){
+    $iv = '0000000000000000';//初始向量
+    $text = bin2hex(random_bytes(32)).$text;//加密明文前需要64位随机字符串
+    $pad = 16 - (strlen($text) % 16);
+    $text = $text . str_repeat(chr($pad), $pad);//PKCS5填充
+    $res = openssl_encrypt($text, 'AES-128-CBC', $key, OPENSSL_NO_PADDING, $iv);//加密
+    return base64_encode($res);//base64编码
+}
+//AES加密2(表单用)
+function AESEncrypt2($text, $key=AESKEY){
+    $iv = "\x01\x02\x03\x04\x05\x06\x07\x08\x09\x01\x02\x03\x04\x05\x06\x07";//初始向量
+    //$text = bin2hex(random_bytes(32)).$text;//加密明文前需要64位随机字符串
+    //$pad = 16 - (strlen($text) % 16);
+    //$text = $text . str_repeat(chr($pad), $pad);//PKCS5填充
+    $res = openssl_encrypt($text, 'AES-128-CBC', $key,OPENSSL_RAW_DATA, $iv);//加密
     return base64_encode($res);//base64编码
 }
 //系统随机数，任务唯一标识

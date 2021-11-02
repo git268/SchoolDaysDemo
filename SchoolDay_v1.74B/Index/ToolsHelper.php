@@ -1,6 +1,8 @@
 <?php
 const DESKEY = 'b3L26XNL';
 const AESKEY = 'ytUQ7l2ZZu8mLvJZ';
+const APPVERSION = '9.0.12';
+const MOBILETYPE = 'ONEPLUS A6000';
 
 //结果推送
 function SendNotice($content, $notice){
