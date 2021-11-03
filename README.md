@@ -3,32 +3,16 @@
 
 ## 部署方法：
 
-### 1，执行环境：PHP7，建议使用本地或服务器执行，并不建议将代码包部署于云函数上（大多数IP段会提示登录失败，密码错误）。
+### 1,执行环境：PHP7，建议使用本地或服务器执行，并不建议将代码包部署于云函数上（大多数IP段会提示登录失败，密码错误）。
 
 **额外需要注意：经纬度尽量六位小数**
 
 ### 2,选择你的版本：
-**!!!推荐使用服务器版（SchoolDay_v1.74B）!!!** 服务器版：`[SchoolDay_v1.74B]`可部署于本地或服务器上，更加适用于多用户。自带多用户乱序排序与随机延时，更好模拟真实情况。  
+**!!!😁推荐部署在服务器上!!!** 部署于本地或服务器上，更加适用于多用户。自带多用户乱序排序与随机延时，更好模拟真实情况。  
 支持图片上传，自带今日校园精简学校列表，加快读取速度。  
 `注意：`某些服务器可能因为权限或不明原因导致php文件无法使用相对路径导入其他不同路径的php文件，请用命令`chmod -R 777 目录绝对路径`修改权限。
 
-**!!!云函数版（SchoolDay_v1.74A）停止维护(原因请看API服务器篇)!!!**：`[SchoolDay_v1.74A]`适用于云函数，但近期腾讯云并不稳定，建议使用阿里云云函数。  
-不推荐在云函数上使用多用户及内置模拟登陆。  
-
-默认为阿里云云函数，若部署环境为腾讯云云函数，请将index.php中的主函数
-
-	function handler(){
-		...
-	}
-
-函数名更改为
-	
-
-	function main_handler(){
-		...
-	}
-
-
+**!!!🤢云函数版（/SchoolDay_CloudFunction）停止维护(原因请看API服务器篇)!!!**
 
 
 ### 3,填写`Config.php`中User()的信息：  
@@ -95,10 +79,10 @@
 
 
 #### 脚本支持的推送方式：  
-'ServerChanKey' ： Server酱油key  
+'ServerChanKey' ： Server酱key  
 'QmsgKey'：     Qmsg酱key  
 'TGKey'：	telegram bot两个参数[token与聊天id]  
-'pushplus'	pushplus的token  
+'pushplus'	pushplus的token **强烈推荐😁** 
 皆用于消息推送，使用哪个填哪个多用户可同时使用不同的推送模式，key在`Config.php`的User中的notice。
 
 
@@ -154,12 +138,14 @@
 若你的签到问卷全为选择题，可以跳过此步骤，下列展示为非选择题情况。  
 `查寝`只需填写下方图片路径即可。答卷在`SubmitForm.php`中。
 
-	$form = [
-		'signPhotoUrl'=> '图片路径',
-		...
-		'extraFieldItems'=> [答案],
-		...
-		],
+```php
+$form = [
+	'signPhotoUrl'=> '图片路径',
+	...
+	'extraFieldItems'=> [答案],
+	...
+	],
+```
 问卷：
 
 	1：今天你的体重是多？  [纯文本]
@@ -174,34 +160,37 @@
 	答：是
 若只是单纯签到，没有额外问题，则：
 
-	'extraFieldItems'=> [],  
-若要上传图片，请将
-	
-	'signPhotoUrl'=> '',
-改成
-
-	'signPhotoUrl'=> '图片路径',//图片路径如SaveFile/sample.png
+```php
+'extraFieldItems'=> [],  
+```
+若要上传图片，请把照片存入SaveFile文件夹，并将Index/Config.php中对应用户的photo修改。
+```php
+'photo'=> '图片路径',//图片路径如../SaveFile/sample.png
+```
 `注意`：图片上传需要读取权限，某些服务器甚至需要填写图片绝对路径。  
-该功能需要执行环境有读取权限，云函数一般不支持该功能。若你没有图床也没有适合的执行环境，且辅导员不看提交内容，
-可填写今日校园的官网logo图片路径：
+该功能需要执行环境有读取权限(一般不设置也不会出问题)
 	
-	'signPhotoUrl'=> 'https://www.campushoy.com/wp-content/uploads/2019/06/cropped-hoy.png',//图片路径如savefile/sample.png
+
+```php
+'photo'=> 'https://www.campushoy.com/wp-content/uploads/2019/06/cropped-hoy.png'
+```
 
 
 样卷格式：
 
 	 'extraFieldItems'=> ['599.88KG'],  
 即只用填写非选择题答案，请按照先后顺序。
-			 
 ### 信息收集答卷填写
 适用于信息收集，下列问题用于展示不同问题的答案样本，可适当增删改。
 信息收集答卷在`SubmitForm.php`文件的CollectForm()中
 
-	$data = [
-		...
-		'form'=> [答案],
-		...
-		],
+```php
+$data = [
+	...
+	'form'=> [答案],
+	...
+	],
+```
 问卷：
 
 	1：你的籍贯是（以户口本为准）	[三级联动，省市区三项选择]  
@@ -231,14 +220,16 @@
 
 答卷格式：
 
-	 'form'=> [
-		    'xx省/xx市/xx区',
-		    'xx省xx市xx区xx路xx号',
-		    '2077-01-01/12:00',
-		    ['公交'],
-		    ['早餐', '午餐', '晚餐'],
-		    ['否'],
-		    'SaveFile/sample.png' ],
+```php
+ 'form'=> [
+	    'xx省/xx市/xx区',
+	    'xx省xx市xx区xx路xx号',
+	    '2077-01-01/12:00',
+	    ['公交'],
+	    ['早餐', '午餐', '晚餐'],
+	    ['否'],
+	    'SaveFile/sample.png' ],
+```
 
 填写格式注意：
 签到、查寝图片上传需要另行创建与本项目处于同一目录下
@@ -267,10 +258,14 @@
 替换代码：
 找到`index.php`中的
 
-	Getcookie($user['username'], $user['password']);//本地模拟登录获取cookie
+```php
+Getcookie($user['username'], $user['password']);//本地模拟登录获取cookie
+```
 将其更改为
 
-	Getcookie($user['username'], $user['password'], $serviceapi);//外置API模拟登陆获取cookie
+```php
+Getcookie($user['username'], $user['password'], $serviceapi);//外置API模拟登陆获取cookie
+```
 
 执行，若账号密码填写正确，且出现
 
@@ -285,21 +280,29 @@
 #### 使用方法
 在`SignTask.php`[签到]/`CollectMessage.php`[信息收集]的执行路径上，最好是第一个方法的第一行添加，如想延时5-30秒可以这样填写：
 
-	function getSignTasks / getCollectTasks (...){
-		Timer([5, 30]);//随机延时5-30秒
-		...
-	}
+```php
+function getSignTasks / getCollectTasks (...){
+	Timer([5, 30]);//随机延时5-30秒
+	...
+}
+```
 #### 注意事项
 由于启用随机延时，请注意你的云函数执行时间上限，并且如腾讯云，阿里云的云函数会对执行时长作为计费标准之一，请留意最坏执行时长及使用频率。
 若为本地执行或服务器执行，则要留意`index.php`上方
 
-	set_time_limit(150);//设置执行时间上限(150秒)
+```php
+set_time_limit(150);//设置执行时间上限(150秒)
+```
 本脚本默认在`index.php`中的main_handler方法找到
 
-	//Timer([5, 25]);//随机延时5-25秒
+```php
+//Timer([5, 25]);//随机延时5-25秒
+```
 去掉前面的注释变成
 
-	Timer([5, 25]);//随机延时5-25秒
+```php
+Timer([5, 25]);//随机延时5-25秒
+```
 就能提供随机延时。
 
 ### 定时器使用方法
@@ -330,11 +333,13 @@ Timer亦提供精确定时功能，使用得当可以准时签到，指~~0秒签
 遇到报错难以解决，可在签到任务请打开`SignTask.php`，信息收集任务打开`CollectMessage.php`
 找出全部的	
 
-	print_r(xxx);
+```php
+print_r(xxx);
+```
 
 去掉他们前面的`//`，再次执行
 观察日志到哪一步时没有结果或异常，如看到`['msg']`中出现SUCCESS以外的文本
 打印的任务表单与你想要填写的内容是否正确。
 
-## 自己给自己star
+## 不要吝啬您的star
 
