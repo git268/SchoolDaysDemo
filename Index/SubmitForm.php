@@ -51,7 +51,7 @@ function SubmitTask($url, $form, $user, $type, $headers = ''){
         $data4sign['userId'] = $user['username'];
         ksort($data4sign,SORT_STRING);
         $sign_tmp = http_build_query(($data4sign)).'&'.AESKEY;
-        print_r($sign_tmp);
+        //print_r($sign_tmp);
         $sign = md5($sign_tmp);
         //FINAL RESULT
         $forSubmit = $extension;

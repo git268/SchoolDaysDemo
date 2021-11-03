@@ -5,13 +5,13 @@ function User(){
     $user = [
         [  'username'=> '账号A', 'password'=>'密码A', 'lon'=> '经度', 'lat'=> '纬度',
             'school'=> '学校全称',  'abnormalReason'=> '在学校', 'address'=>'地址',
-            'mode'=> '任务A', 'notice'=> ['type'=>'推送类型A', 'key'=> '推送方式的key']],
+            'photo'=>'../SaveFile/black.jpg','mode'=> '任务A', 'notice'=> ['type'=>'推送类型A', 'key'=> '推送方式的key']],
         [  'username'=> '账号B', 'password'=>'密码B', 'lon'=> '经度', 'lat'=> '纬度',
             'school'=> '学校全称',  'abnormalReason'=> '在学校', 'address'=>'地址',
-            'mode'=> '任务B', 'notice'=> ['type'=>'推送类型B', 'key'=> '推送方式的key']],
+            'photo'=>'../SaveFile/black.jpg','mode'=> '任务B', 'notice'=> ['type'=>'推送类型B', 'key'=> '推送方式的key']],
         [ 'username'=> '账号C', 'password'=>'密码C', 'lon'=> '经度', 'lat'=> '纬度',
             'school'=> '学校全称',  'abnormalReason'=> '在学校', 'address'=>'地址',
-            'mode'=> '任务C', 'notice'=> ['type'=>'推送类型C', 'key'=> '推送方式的key']]
+            'photo'=>'../SaveFile/black.jpg','mode'=> '任务C', 'notice'=> ['type'=>'推送类型C', 'key'=> '推送方式的key']]
     ];
     return $user;
 }
@@ -20,7 +20,7 @@ function SignAPIS(){
     $apis = [   'datas-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/sign/getStuSignInfosInOneDay',
         'task-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/sign/detailSignInstance',
         'put-photo'=>'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/oss/getUploadPolicy',
-        'get-photo'=> 'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/sign/previewAttachment',
+        'get-photo'=> 'https://'.$_POST['school']['host'].'/wec-counselor-attendance-apps/student/attendance/previewAttachment',
         'submit-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/sign/submitSign' ];
     return $apis;
 }
@@ -29,8 +29,6 @@ function CollectAPIS(){
     $apis = [   'datas-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/queryCollectorProcessingList',
         'task-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/detailCollector',
         'form-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/getFormFields',
-        'put-photo'=>'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/oss/getUploadPolicy',
-        'get-photo'=> 'https://'.$_POST['school']['host'].'/wec-counselor-attendance-apps/student/attendance/previewAttachment',
         'submit-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-collector-apps/stu/collector/submitForm'   ];
     return $apis;
 }
@@ -59,14 +57,14 @@ function SchoolMessageURL(){
 //获取任务请求头
 function TaskHeader(){
     $header = [ 'Accept:application/json, text/plain, */*',
-        'User-Agent:Mozilla/5.0 (Linux; Android 6.0.1; vivo Y66L Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.81 Mobile Safari/537.36  cpdaily/8.2.20 wisedu/8.2.20',
+        'User-Agent:Mozilla/5.0 (Linux; Android 11.0.2; '.MOBILETYPE.' Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.81 Mobile Safari/537.36  cpdaily/'.APPVERSION.' wisedu/'.APPVERSION.'',
         'content-type:application/json', 'Cookie:'.$_COOKIE,
         'Accept-Language:zh-CN,en-US;q=0.8', 'Content-Type:application/json;charset=UTF-8'  ];
     return $header;
 }
 //提交签到表单请求头
 function SubmitHeader($extension){
-    $header = [ 'User-Agent:Mozilla/5.0 (Linux; Android 6.0.1; vivo Y66L Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.81 Mobile Safari/537.36  cpdaily/8.2.20 wisedu/8.2.20',
+    $header = ['User-Agent:Mozilla/5.0 (Linux; Android 11.0.2; '.MOBILETYPE.' Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.81 Mobile Safari/537.36  cpdaily/'.APPVERSION.' wisedu/'.APPVERSION.'',
                 'CpdailyStandAlone:0', 'extension:1', 'Cpdaily-Extension:'.$extension,'Cookie:'.$_COOKIE,
                 'Content-Type:application/json; charset=utf-8', 'Connection:Keep-Alive' ];
     return $header;
@@ -74,7 +72,7 @@ function SubmitHeader($extension){
 //模拟登录请求头
 function DoLoginHeader($referer){
     $header = [ 'Accept: application/json, text/plain, */*', 'Accept-Language: zh-CN,zh;q=0.8', 'Connection: keep-alive',
-        'User-Agent:Mozilla/5.0 (Linux; Android 6.0.1; vivo Y66L Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.81 Mobile Safari/537.36  cpdaily/8.2.20 wisedu/8.2.20',
+        'User-Agent:Mozilla/5.0 (Linux; Android 11.0.2; '.MOBILETYPE.' Build/MMB29M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/51.0.2704.81 Mobile Safari/537.36  cpdaily/'.APPVERSION.' wisedu/'.APPVERSION.'',
                 'Referer: '.$referer, 'Cookie: '.$_COOKIE, 'Content-Type:application/x-www-form-urlencoded'];
     return $header;
 }
