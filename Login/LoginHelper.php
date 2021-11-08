@@ -9,15 +9,7 @@ function PregMatchMsg($responsehead, $start, $end, $flag=false) {
     else
         return implode(';', $text[1]);//返回全部匹配的信息，使用;分隔
 }
-//AES加密
-function AESEncrypt($text, $key){
-    $iv = '0000000000000000';//初始向量
-    $text = bin2hex(random_bytes(32)).$text;//加密明文前需要64位随机字符串
-    $pad = 16 - (strlen($text) % 16);
-    $text = $text . str_repeat(chr($pad), $pad);//PKCS5填充
-    $res = openssl_encrypt($text, 'AES-128-CBC', $key, OPENSSL_NO_PADDING, $iv);//加密
-    return base64_encode($res);//base64编码
-}
+
 //分析模拟登录类型
 function AnalysisType($url, $name, $pwd){
     switch($url){

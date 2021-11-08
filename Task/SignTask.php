@@ -19,10 +19,10 @@ function getSignTasks($user, $apis){//签到
         print_r($address);
         */
         echo"<br>当前任务<br>";
-        print_r($res);
+        //print_r($res);
         if($res['isNeedExtra'] == 1)//判断有无附加问题
-            $form['extraFieldItems'] = FillSignForm($res, $form['extraFieldItems']);//手动填充答卷
-        //$form['extraFieldItems'] = FillSignForm($res, $form['extraFieldItems'], true);//自动填充答卷
+            //$form['extraFieldItems'] = FillSignForm($res, $form['extraFieldItems']);//手动填充答卷
+            $form['extraFieldItems'] = FillSignForm($res, $form['extraFieldItems'], true);//自动填充答卷
         else
             $form['extraFieldItems'] = [];//清空额外项
         if($res['isPhoto'] ==1)//判断是否需要上传图片

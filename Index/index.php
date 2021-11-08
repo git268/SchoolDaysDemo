@@ -8,7 +8,7 @@ require_once '../Login/SimulationLogin.php';//模拟登录
 date_default_timezone_set('PRC');//设置北京时间
 set_time_limit(900);//设置执行时间上限(900秒)
 function main_handler(){
-    //$serviceapi = 'http://www.zimo.wiki:8080/wisedu-unified-login-api-v1.0/api/login';//外置API
+    //$serviceapi = 'http://xxx.com/wisedu-unified-login-api-v1.0/api/login';//外置API
     $time = date('Y-m-d H:i:s');//起始时间
     $user = User();
     $url = SchoolMessageURL();
@@ -18,7 +18,7 @@ function main_handler(){
     $rank = RandomList($i);//生成随机唯一id
     $list = json_decode(file_get_contents('../SaveFile/list.txt'), true);//本地获取list
     for(; $i >= 0; $i--){
-        //Timer([10, 27]);//随机延时10-27秒
+        Timer([1, 3]);//随机延时1-2秒
         FindSchoolUrl($list, $user[$rank[$i]]['school'], $url['info']);
         if(isset($_POST['school'])){
             //Getcookie($user[$rank[$i]]['username'], $user[$rank[$i]]['password'], $serviceapi);//外置API模拟登陆获取cookie
@@ -46,7 +46,7 @@ function main_handler(){
             }
             echo $type."\t";
             if(empty($_POST['tips']))$_POST['tips'] = '答卷提交成功！';
-            SendNotice([$_POST['tips'], $user[$rank[$i]]['username']], $user[$rank[$i]]['notice']);
+                SendNotice([$_POST['tips'], $user[$rank[$i]]['username']], $user[$rank[$i]]['notice']);
         }else{
             $_POST['tips'] = '找不到学校，请检查配置有无正确填写！';
         }
@@ -57,6 +57,7 @@ function main_handler(){
     }
     $time = strtotime(date('Y-m-d H:i:s')) - strtotime($time);//结束时间
     echo '任务完成，耗时 : '.$time."秒\n";
+    
 }
 //查找是否支持该学校
 function FindSchoolUrl ($list, $name, $info){//查找键值
@@ -83,6 +84,5 @@ function RandomList($num){
     shuffle($arr);
     return $arr;
 }
-//主函数，若部署在本地请去掉注释
 main_handler();
 ?>
