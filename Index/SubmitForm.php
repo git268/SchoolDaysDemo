@@ -56,7 +56,7 @@ function SubmitTask($url, $form, $user, $type, $headers = ''){
         //FINAL RESULT
         $forSubmit = $extension;
         $forSubmit['calVersion'] = 'firstv';
-        $forSubmit['version'] = 'first_v2';
+        $forSubmit['version'] = FORMVERSION;
         $forSubmit['sign'] = $sign;
         $forSubmit['bodyString'] = $bodyString;
         ksort($forSubmit,SORT_STRING);

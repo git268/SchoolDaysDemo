@@ -9,6 +9,7 @@ function getCollectTasks($user, $apis) {//信息收集
     if (isset($datas[0]) && empty($_POST['tips'])){//判断有无任务及cookie是否正常
         $collectWid = $datas[0]['wid'];//获取任务wid
         $formWid = $datas[0]['formWid'];
+        $iWid = $datas[0]['instanceWid'];
         $schoolTaskWid = json_decode(SendRequest($apis['task-url'], $headers, json_encode(['collectorWid' => $collectWid])), true)['datas'];
         //echo "<br>第三次请求具体信息收集任务<br>";
         $params = json_encode(['pageSize' => 100, 'pageNumber' => 1, 'formWid' => $formWid, 'collectorWid' => $collectWid]);
@@ -18,6 +19,7 @@ function getCollectTasks($user, $apis) {//信息收集
         $form = CollectForm($formWid, $collectWid, $schoolTaskWid['collector']['schoolTaskWid'], $user);//获取答卷
         //$form['form'] = FillCollectForm($res['datas']['rows'], $form['form']);//手动填充答卷
         $form['form'] = FillCollectForm($res['datas']['rows'], $form['form'], true);//自动填充答卷
+        $form['instanceWid'] = $iWid;//$iWid
         print_r($form);
         SubmitTask($apis['submit-url'], $form, $user, 1);//提交表单
     }else{
