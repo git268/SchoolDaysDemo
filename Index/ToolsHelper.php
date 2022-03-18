@@ -1,7 +1,8 @@
 <?php
 const DESKEY = 'XCE927==';
 const AESKEY = 'SASEoK4Pa5d4SssO';
-const APPVERSION = '9.0.14';
+const APPVERSION = '9.0.19';
+const CALVERSION = 'firstv';
 const FORMVERSION = 'first_v3';
 const MOBILETYPE = 'ONEPLUS A6000';
 
@@ -58,8 +59,8 @@ function UploadPicture($path, $puturl, $geturl){
     $info = '.'.explode('/',getimagesize($path)['mime'])[1];//获取图片格式
     $res = json_decode(SendRequest($puturl, $header, json_encode(['fileType'=> 1])), true)['datas'];//获取今日校园图床url
     $fileName = $res['fileName'].$info;//获取上传的文件夹位置
-    $data = ['key'=> $fileName, 'OSSAccessKeyId'=> $res['accessid'], 'success_action_status'=> '200',
-        'policy'=> $res['policy'],'signature'=> $res['signature'], 'file'=>file_get_contents($path), 'image/jpg'];//填写参数
+    $data = ['key'=> $fileName, 'AccessKeyId'=> $res['accessid'], 'success_action_status'=> '200',
+        'policy'=> $res['policy'],'signature'=> $res['signature'], 'x-obs-acl'=> 'public-read', 'file'=>file_get_contents($path), 'image/jpg'];//填写参数
     SendRequest($res['host'], ['User-Agent:Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:50.0) Gecko/20100101 Firefox/50.0'], $data);//上传图片
     return json_decode(SendRequest($geturl, $header, json_encode(['ossKey'=> $fileName])), true)['datas'];//获取上传图片后的图床url
 }

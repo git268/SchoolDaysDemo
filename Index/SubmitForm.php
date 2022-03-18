@@ -55,7 +55,7 @@ function SubmitTask($url, $form, $user, $type, $headers = ''){
         $sign = md5($sign_tmp);
         //FINAL RESULT
         $forSubmit = $extension;
-        $forSubmit['calVersion'] = 'firstv';
+        $forSubmit['calVersion'] = CALVERSION;
         $forSubmit['version'] = FORMVERSION;
         $forSubmit['sign'] = $sign;
         $forSubmit['bodyString'] = $bodyString;

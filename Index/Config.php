@@ -36,8 +36,8 @@ function CollectAPIS(){
 function AttendanceAPIS(){
     $apis = [   'datas-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-attendance-apps/student/attendance/getStuAttendacesInOneDay',
         'task-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-attendance-apps/student/attendance/detailSignInstance',
-        'put-photo'=>'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/oss/getUploadPolicy',
-        'get-photo'=> 'https://'.$_POST['school']['host'].'/wec-counselor-attendance-apps/student/attendance/previewAttachment',
+        'put-photo'=>'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/obs/getUploadPolicy',
+        'get-photo'=> 'https://'.$_POST['school']['host'].'/wec-counselor-sign-apps/stu/sign/previewAttachment',
         'submit-url'=> 'https://'.$_POST['school']['host'].'/wec-counselor-attendance-apps/student/attendance/submitSign' ];
     return $apis;
 }
